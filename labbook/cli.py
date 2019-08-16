@@ -76,7 +76,7 @@ def main():
     log_parser.add_argument('path', type=str)
     
     log_parser = sub.add_parser('comment')
-    log_parser.add_argument('uuid', type=str)
+    log_parser.add_argument('uuid', type=str, nargs='?')
     log_parser.add_argument('comment', type=str)
 
     args = parser.parse_args()

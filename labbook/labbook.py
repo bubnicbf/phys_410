@@ -73,16 +73,20 @@ class LabBook(object):
                 shutil.copy(path, storage_path)
 
     def log(self):
-        for experiment in self.storage.filter(Experiment, {}):
+        for experiment in sorted(self.storage.filter(Experiment, {}), key=lambda e: e.date):
             yield experiment
 
 
     def set_comment(self, uuid, comment):
         try:
-            experiment = self.storage.get(Experiment, {'uuid': {'$regex': uuid + '.*'}})
+            if uuid is not None:
+                experiment = self.storage.get(Experiment, {'uuid': {'$regex': uuid + '.*'}})
+            else:
+                experiment = sorted(self.storage.filter(Experiment, {}), key=lambda e: e.date)[-1]
+                print experiment
         except Experiment.DoesNotExist:
             raise UUIDNotFoundError("There is no experiment with a (partial) uuid of '{0}'.".format(uuid))
-        except Experiment.MultipleObjectsReturned:
+        except Experiment.MultipleDocumentsReturned as exc:
             raise AmbiguousUUIDError("There are multiple experiments with a (partial) uuid of '{0}'. Try to be more specific!".format(uuid))
         else:
             experiment.comment = comment
