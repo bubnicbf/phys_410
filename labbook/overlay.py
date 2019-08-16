@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
+# -*- coding: utf-8 -*-
+
+__all__ = ['mount']
+
 
 from __future__ import with_statement
 
@@ -7,7 +11,6 @@ import sys
 import errno
 
 from fuse import FUSE, FuseOSError, Operations
-
 
 class Overlay(Operations):
     def __init__(self, mount, root, overlay):
