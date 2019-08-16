@@ -18,7 +18,7 @@ class Interface(object):
         try:
             labbook = LabBook.create(path)
         except LabBookAlreadyExistsError as exc:
-            print exc.message
+            print(exc.message)
         else:
             print("I created a labbook for you in '{0}'. Get to work!".format(labbook.path))
 
@@ -39,11 +39,11 @@ class Interface(object):
             print(exc.message)
         else:
             for experiment in labbook.log():
-                print "{date}: {cmd} ({uuid})".format(
+                print("{date}: {cmd} ({uuid})".format(
                         date = datetime.datetime.fromtimestamp(float(experiment.date)).strftime('%a %b %d %H:%M:%S %Y'),
                         cmd = experiment.command_line,
                         uuid = experiment.uuid
-                        )
+                        ))
                 if experiment.comment:
                     print("\n    {0}\n".format(experiment.comment))
                 else:
