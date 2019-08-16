@@ -1,14 +1,14 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-__all__ = ['mount']
-
-
 from __future__ import with_statement
 
+__all__ = ['mount']
+
 import os
-import sys
 import errno
+import ctypes
+import threading
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -147,6 +147,3 @@ class Overlay(Operations):
 
 def mount(mountpoint, root, overlay):
     FUSE(Overlay(mountpoint, root, overlay), mountpoint, foreground=True)
-
-if __name__ == '__main__':
-    mount(sys.argv[3], sys.argv[1], sys.argv[2])

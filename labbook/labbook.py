@@ -4,11 +4,10 @@
 __all__ = ['LabBook', 'is_labbook']
 
 import os
-import shutil
 import random
 import tempfile
-import threading
-import csv
+import time
+import multiprocessing
 
 from .overlay import mount
 from .experiment import ExperimentRunner
@@ -56,12 +55,8 @@ class LabBook(object):
         storage_path = os.path.join(self.path, '.labbook', 'storage', uuid)
         os.mkdir(storage_path)
 
-        def overlay():
-            mount(temp_path, os.getcwd(), storage_path)
-        overlay_thread = threading.Thread(target=overlay)
-        overlay_thread.daemon = True
-        overlay_thread.start()
-        import time
+        fs_proc = multiprocessing.Process(target=mount, args=(temp_path, os.getcwd(), storage_path))
+        fs_proc.start()
         time.sleep(.1)
 
         command_line = ' '.join(command_line)
@@ -72,6 +67,7 @@ class LabBook(object):
         except Exception as exc:
             raise exc
         finally:
+            fs_proc.terminate()
             self.storage.save(Experiment({
                 'uuid': uuid,
                 'command_line': command_line,
