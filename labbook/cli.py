@@ -40,15 +40,26 @@ class Interface(object):
         else:
             for experiment in labbook.log():
                 print "{date}: {cmd} ({uuid})".format(
-                        date = datetime.datetime.fromtimestamp(float(experiment[3])).strftime('%a %b %d %H:%M:%S %Y'),
-                        cmd = experiment[1],
-                        uuid = experiment[0]
+                        date = datetime.datetime.fromtimestamp(float(experiment.date)).strftime('%a %b %d %H:%M:%S %Y'),
+                        cmd = experiment.command_line,
+                        uuid = experiment.uuid
                         )
-                if experiment[5]:
-                    print("\n    {0}\n".format(experiment[5]))
+                if experiment.comment:
+                    print("\n    {0}\n".format(experiment.comment))
                 else:
                     print("\n    (no comment)\n")
 
+    def comment(self, args):
+        path = os.getcwd()
+        try:
+            labbook = LabBook(path)
+        except LabBookNotFoundError as exc:
+            print(exc.message)
+        else:
+            try:
+                labbook.set_comment(args.uuid, args.comment)
+            except (UUIDNotFoundError, AmbiguousUUIDError) as exc:
+                print(exc.message)
 
 def main():
     import argparse
@@ -63,6 +74,10 @@ def main():
     
     log_parser = sub.add_parser('create')
     log_parser.add_argument('path', type=str)
+    
+    log_parser = sub.add_parser('comment')
+    log_parser.add_argument('uuid', type=str)
+    log_parser.add_argument('comment', type=str)
 
     args = parser.parse_args()
     

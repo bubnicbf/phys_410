@@ -6,3 +6,9 @@ class LabBookAlreadyExistsError(Exception):
 
 class LabBookNotFoundError(Exception):
     pass
+
+class UUIDNotFoundError(Exception):
+    pass
+
+class AmbiguousUUIDError(Exception):
+    pass

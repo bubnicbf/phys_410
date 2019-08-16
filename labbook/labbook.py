@@ -8,8 +8,9 @@ import shutil
 import random
 import csv
 
-from .experiment import Experiment
+from .experiment import ExperimentRunner
 from .exceptions import *
+from .storage import Experiment, FileBackend, DoesNotExist
 
 def is_labbook(path):
     return os.path.exists(os.path.join(path, '.labbook'))
@@ -30,6 +31,8 @@ class LabBook(object):
         self.path = path
         if (not path) or (not is_labbook(path)):
             raise LabBookNotFoundError("There is no lab book in '{0}'.".format(path))
+        
+        self.storage = FileBackend(os.path.join(path, '.labbook', 'experiments.db'))
    
     @classmethod
     def create(cls, path):
@@ -39,7 +42,7 @@ class LabBook(object):
 
         os.mkdir(os.path.join(path, '.labbook'))
         os.mkdir(os.path.join(path, '.labbook', 'storage'))
-        open(os.path.join(path, '.labbook', 'experiments'), 'a')
+        #open(os.path.join(path, '.labbook', 'experiments'), 'a')
 
         return cls(path)
 
@@ -49,22 +52,39 @@ class LabBook(object):
         os.mkdir(storage_path)
         
         command_line = ' '.join(command_line)
-        experiment = Experiment(storage_path, uuid, command_line)
+        experiment = ExperimentRunner(storage_path, uuid, command_line)
 
         try:
             experiment.run()
         except Exception as exc:
             raise exc
         finally:
-            log = open(os.path.join(self.path, '.labbook', 'experiments'), 'a')
-            log_writer = csv.writer(log)
-            log_writer.writerow([uuid, command_line, os.getcwd(), round(experiment.start_time, 3), round(experiment.run_time, 3), ""])
+            self.storage.save(Experiment({
+                'uuid': uuid,
+                'command_line': command_line,
+                'working_directory': os.getcwd(),
+                'date': round(experiment.start_time, 3),
+                'runtime': round(experiment.run_time, 3),
+                'comment': ""
+                }))
+            self.storage.commit()
 
             for path in experiment.collect():
                 shutil.copy(path, storage_path)
 
     def log(self):
-        log = open(os.path.join(self.path, '.labbook', 'experiments'))
-        log_reader = csv.reader(log)
-        for experiment in log_reader:
+        for experiment in self.storage.filter(Experiment, {}):
             yield experiment
+
+
+    def set_comment(self, uuid, comment):
+        try:
+            experiment = self.storage.get(Experiment, {'uuid': {'$regex': uuid + '.*'}})
+        except Experiment.DoesNotExist:
+            raise UUIDNotFoundError("There is no experiment with a (partial) uuid of '{0}'.".format(uuid))
+        except Experiment.MultipleObjectsReturned:
+            raise AmbiguousUUIDError("There are multiple experiments with a (partial) uuid of '{0}'. Try to be more specific!".format(uuid))
+        else:
+            experiment.comment = comment
+            experiment.save()
+            self.storage.commit()

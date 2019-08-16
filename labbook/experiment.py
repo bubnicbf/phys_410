@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-__all__ = ['Experiment']
+__all__ = ['ExperimentRunner']
 
 import sys
 import os
@@ -9,7 +9,7 @@ import time
 import select
 from subprocess import Popen, PIPE
 
-class Experiment(object):
+class ExperimentRunner(object):
     def __init__(self, path, uuid, command_line):
         self.path = path
         self.uuid = uuid
