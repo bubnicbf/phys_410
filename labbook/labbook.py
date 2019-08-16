@@ -6,8 +6,11 @@ __all__ = ['LabBook', 'is_labbook']
 import os
 import shutil
 import random
+import tempfile
+import threading
 import csv
 
+from .overlay import mount
 from .experiment import ExperimentRunner
 from .exceptions import *
 from .storage import Experiment, FileBackend, DoesNotExist
@@ -48,11 +51,21 @@ class LabBook(object):
 
     def run(self, command_line):
         uuid = '{0:032x}'.format(random.getrandbits(128))
+        
+        temp_path = tempfile.mkdtemp()
         storage_path = os.path.join(self.path, '.labbook', 'storage', uuid)
         os.mkdir(storage_path)
-        
+
+        def overlay():
+            mount(temp_path, os.getcwd(), storage_path)
+        overlay_thread = threading.Thread(target=overlay)
+        overlay_thread.daemon = True
+        overlay_thread.start()
+        import time
+        time.sleep(.1)
+
         command_line = ' '.join(command_line)
-        experiment = ExperimentRunner(storage_path, uuid, command_line)
+        experiment = ExperimentRunner(temp_path, uuid, command_line)
 
         try:
             experiment.run()
@@ -69,9 +82,6 @@ class LabBook(object):
                 }))
             self.storage.commit()
 
-            for path in experiment.collect():
-                shutil.copy(path, storage_path)
-
     def log(self):
         for experiment in sorted(self.storage.filter(Experiment, {}), key=lambda e: e.date):
             yield experiment
@@ -83,7 +93,6 @@ class LabBook(object):
                 experiment = self.storage.get(Experiment, {'uuid': {'$regex': uuid + '.*'}})
             else:
                 experiment = sorted(self.storage.filter(Experiment, {}), key=lambda e: e.date)[-1]
-                print experiment
         except Experiment.DoesNotExist:
             raise UUIDNotFoundError("There is no experiment with a (partial) uuid of '{0}'.".format(uuid))
         except Experiment.MultipleDocumentsReturned as exc:

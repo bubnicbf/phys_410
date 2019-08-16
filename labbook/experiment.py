@@ -22,7 +22,7 @@ class ExperimentRunner(object):
 
         self.start_time = time.time()
         try:
-            proc = Popen(self.command_line.split(), stdout=PIPE, stderr=PIPE)
+            proc = Popen(self.command_line.split(), stdout=PIPE, stderr=PIPE, cwd=self.path)
             while proc.poll() is None:
                 rlist, wlist, xlist = select.select([proc.stdout, proc.stderr], [], [])
                 for fd in rlist:
@@ -38,10 +38,3 @@ class ExperimentRunner(object):
             raise exc
         finally:
             self.run_time = time.time() - self.start_time
-
-    def collect(self):
-        for path in os.listdir('.'):
-            path = os.path.join(os.path.abspath('.'), path)
-            mtime = os.path.getmtime(path)
-            if mtime > self.start_time:
-                yield path
