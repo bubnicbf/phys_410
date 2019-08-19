@@ -48,11 +48,11 @@ class Complex
 
   Complex add(Complex&);
 
-  Complex operator+ (Complex&);
-  Complex operator- (Complex&);
-  Complex operator* (Complex&);
-  Complex operator/ (Complex&);
-  Complex operator/ (double);
+  Complex operator+ (const Complex&) const;
+  Complex operator- ( Complex&) ;
+  Complex operator* ( Complex&) ;
+  Complex operator/ ( Complex&) ;
+  Complex operator/ ( double) ;
 
   Complex conj();
   double norm();
@@ -64,5 +64,4 @@ class Complex
 // declarations of various functions used by the class
 
 #endif
-
 
