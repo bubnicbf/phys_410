@@ -23,8 +23,6 @@
 #include <GL/glext.h>
 #include <GL/glx.h>
 
-#define GET_PROC_ADDRESS( str ) glXGetProcAddress( (const GLubyte *)str )
-
 #include <iostream>
 
 struct CPUAnimBitmap {
@@ -62,7 +60,7 @@ struct CPUAnimBitmap {
     animExit = e;
 
     int c=1;
-    char* dummy = "";
+    char* dummy = '\0';
     glutInit( &c, &dummy );
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA );
     glutInitWindowSize( width, height );
@@ -83,18 +81,18 @@ struct CPUAnimBitmap {
 
   // static method used for glut callbacks
   static void mouse_func( int button, int state,
-			  int mx, int my ) {
+              int mx, int my ) {
     if (button == GLUT_LEFT_BUTTON) {
       CPUAnimBitmap* bitmap = *(get_bitmap_ptr());
       if (state == GLUT_DOWN) {
-	bitmap->dragStartX = mx;
-	bitmap->dragStartY = my;
+    bitmap->dragStartX = mx;
+    bitmap->dragStartY = my;
       }
       else if (state == GLUT_UP) {
-	bitmap->clickDrag( bitmap->dataBlock,
-			   bitmap->dragStartX,
-			   bitmap->dragStartY,
-			   mx, my );
+        bitmap->clickDrag( bitmap->dataBlock,
+        bitmap->dragStartX,
+        bitmap->dragStartY,
+        mx, my );
       }
     }
   }
@@ -115,7 +113,7 @@ struct CPUAnimBitmap {
       bitmap->animExit( bitmap->dataBlock );
       // delete bitmap;
       exit(0);
-    }
+  }
   }
 
   // static method used for glut callbacks
@@ -131,4 +129,4 @@ struct CPUAnimBitmap {
 #endif // __CPU_ANIM_H__
 
 
-	
+  
