@@ -47,9 +47,9 @@ void generate_frame(DataBlock *d, int ticks) {
   kernel<<<blocks,threads>>>(d->dev_bitmap,ticks);
 
   HANDLE_ERROR(cudaMemcpy(d->bitmap->get_ptr(),
-              d->dev_bitmap,
-              d->bitmap->image_size(),
-              cudaMemcpyDeviceToHost));
+			  d->dev_bitmap,
+			  d->bitmap->image_size(),
+			  cudaMemcpyDeviceToHost));
 }
 
 int main(void){
@@ -61,4 +61,5 @@ int main(void){
 
   bitmap.anim_and_exit((void (*)(void*,int)) generate_frame, (void (*)(void*)) cleanup);
 }
+
 

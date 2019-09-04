@@ -80,19 +80,19 @@ struct CPUAnimBitmap {
   }
 
   // static method used for glut callbacks
-  static void mouse_func( int button, int state,
-              int mx, int my ) {
+  static void mouse_func(	int button, int state,
+							int mx, int my ) {
     if (button == GLUT_LEFT_BUTTON) {
       CPUAnimBitmap* bitmap = *(get_bitmap_ptr());
       if (state == GLUT_DOWN) {
-    bitmap->dragStartX = mx;
-    bitmap->dragStartY = my;
+		bitmap->dragStartX = mx;
+		bitmap->dragStartY = my;
       }
       else if (state == GLUT_UP) {
-        bitmap->clickDrag( bitmap->dataBlock,
-        bitmap->dragStartX,
-        bitmap->dragStartY,
-        mx, my );
+				bitmap->clickDrag( bitmap->dataBlock,
+				bitmap->dragStartX,
+				bitmap->dragStartY,
+				mx, my );
       }
     }
   }
@@ -108,12 +108,12 @@ struct CPUAnimBitmap {
   // static method used for glut callbacks
   static void Key(unsigned char key, int x, int y) {
     switch (key) {
-    case 27:
-      CPUAnimBitmap* bitmap = *(get_bitmap_ptr());
-      bitmap->animExit( bitmap->dataBlock );
-      // delete bitmap;
-      exit(0);
-  }
+		case 27:
+			CPUAnimBitmap* bitmap = *(get_bitmap_ptr());
+			bitmap->animExit( bitmap->dataBlock );
+			// delete bitmap;
+			exit(0);
+	}
   }
 
   // static method used for glut callbacks
@@ -129,4 +129,4 @@ struct CPUAnimBitmap {
 #endif // __CPU_ANIM_H__
 
 
-  
+	

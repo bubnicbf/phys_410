@@ -3,13 +3,8 @@
 ** Chapter 5 Thread Cooperation
 ** 5.3 Shared Memory and Synchronization
 ** 5.3.1 Dot Product
-* This is the same as dotprod.cu on my github repository's subdirectory:
-* ernestyalumni/CompPhys/CUDA-By-Example/dotprod.cu
-* But I'm trying to use C++11 such as new and delete;
-* 20160609 I want to "fix" or "rewrite" the defines and imin to incorporate C++1 best practices; 
-* But it runs now.
 */
-using namespace std;
+
 #include "common/errors.h"
 
 #define imin(a,b) (a<b?a:b)
@@ -55,10 +50,9 @@ int main (void) {
 	float *dev_a, *dev_b, *dev_partial_c;
 	
 	// allocate memory on the cpu side
-	a = new float[N*sizeof(float)];
-	b = new float[N*sizeof(float)];
-	partial_c = new float[blocksPerGrid*sizeof(float)];
-
+	a = (float*)malloc(N*sizeof(float));
+	b = (float*)malloc(N*sizeof(float));
+	partial_c = (float*)malloc(blocksPerGrid*sizeof(float));
 	
 	// allocate the memory on the gpu
 	HANDLE_ERROR(cudaMalloc((void**)&dev_a, N*sizeof(float)));
@@ -96,8 +90,7 @@ int main (void) {
 	cudaFree(dev_partial_c);
 	
 	// free memory on the cpu side
-	delete[] a;
-	delete[] b;
-	delete[] partial_c;
-
+	free(a);
+	free(b);
+	free(partial_c);
 }
