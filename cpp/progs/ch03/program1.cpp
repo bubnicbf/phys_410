@@ -75,7 +75,7 @@ void initialize(double *initial_step, double *x, int *number_of_steps)
 // This function computes the second derivative
 
 void second_derivative( int number_of_steps, double x, double initial_step,
-      double *h_step, double *computed_derivative)
+			double *h_step, double *computed_derivative)
 {
   int counter;
   double h;
@@ -94,7 +94,7 @@ void second_derivative( int number_of_steps, double x, double initial_step,
 
       h_step[counter] = h;
       computed_derivative[counter] =
-  (exp(x+h)-2.*exp(x) + exp(x-h))/(h*h);
+	(exp(x+h)-2.*exp(x) + exp(x-h))/(h*h);
       h = h*0.5;
     } // end of do loop
 
@@ -105,7 +105,7 @@ void second_derivative( int number_of_steps, double x, double initial_step,
 
 // function to write out the final results
 void output(double *h_step, double *computed_derivative, double x,
-      int number_of_steps)
+	    int number_of_steps)
 {
   int i;
   FILE *output_file;
@@ -113,8 +113,9 @@ void output(double *h_step, double *computed_derivative, double x,
   for (i=0; i < number_of_steps; i++)
     {
       fprintf(output_file, "%12.5E %12.5E \n",
-        log10(h_step[i]),log10(fabs(computed_derivative[i]-exp(x))/exp(x)));
+	      log10(h_step[i]),log10(fabs(computed_derivative[i]-exp(x))/exp(x)));
     }
   fclose(output_file);
 
 } // end of function output
+

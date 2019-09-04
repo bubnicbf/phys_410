@@ -26,7 +26,7 @@
 */
 using namespace std;
 #include <iostream>
-#include <fstream>
+#include <fstream>  /* ofstream */
 #include <iomanip>
 #include <cmath>
 #include <cstdlib> /* exit */
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   computed_derivative = new double[number_of_steps];
   // compute the second derivative of exp(x);
   second_derivative( number_of_steps, x, initial_step, h_step,
-             computed_derivative);
+		     computed_derivative);
   // Then we print the results to file
   output(h_step, computed_derivative, x, number_of_steps);
   // free memory
@@ -85,8 +85,8 @@ void initialize(double *initial_step, double *x, int *number_of_steps)
 // This function computes the second derivative
 
 void second_derivative( int number_of_steps, double x,
-            double initial_step, double *h_step,
-            double *computed_derivative)
+			double initial_step, double *h_step,
+			double *computed_derivative)
 {
   int counter;
   double h;
