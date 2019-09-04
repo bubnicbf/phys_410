@@ -12,13 +12,13 @@ int main(void) {
 
   int count;
   HANDLE_ERROR(
-           cudaGetDeviceCount( &count )
-           );
+	       cudaGetDeviceCount( &count )
+	       );
 
   for (int i = 0 ; i < count ; i++ ) {
     HANDLE_ERROR(
-         cudaGetDeviceProperties( &prop, i )
-         );
+		 cudaGetDeviceProperties( &prop, i )
+		 );
     printf( "Name: %s\n", prop.name );
     
   }
