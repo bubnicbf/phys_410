@@ -1,9 +1,9 @@
-/* main.cpp
- * 1-dimensional double derivative ('') by finite difference with global memory
+/* main.cu
+ * 1-dimensional double derivative (dd or '') by finite difference with shared memory
  * Ernest Yeung  ernestyalumni@gmail.com
  * 20160625
  */
- #include "dd_1d_global.h"
+ #include "dd_1d_shared.h"
  #include <math.h>
  #include <stdio.h>
  
