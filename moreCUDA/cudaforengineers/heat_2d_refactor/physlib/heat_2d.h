@@ -6,6 +6,14 @@
 #ifndef __HEAT_2D_H__
 #define __HEAT_2D_H__
 
+#include "../commonlib/finitediff.h"
+#include "dev_R2grid.h"
+
+extern __constant__ float dev_Deltat[1]; // Deltat
+
+extern __constant__ float dev_heat_params[2] ; // dev_heat_params[0] = \kappa, 
+					// dev_heat_params[1] = c_V = heat capacity at constant volume per volume
+
 struct uchar4;
 // struct BC that contains all the boundary conditions
 typedef struct {
@@ -17,6 +25,13 @@ typedef struct {
 
 
 void kernelLauncher(uchar4 *d_out, float *d_temp, int w, int h, BC bc, dim3 M_in) ; 
+
+void kernelLauncher2(uchar4 *d_out, float *d_temp, int w, int h, BC bc, dim3 M_in) ; 
+
+void kernelLauncher3(uchar4 *d_out, float *d_temp, int w, int h, BC bc, dim3 M_in) ; 
+
+void kernelLauncher4(uchar4 *d_out, float *d_temp, int w, int h, BC bc, dim3 M_in) ; 
+
 
 void resetTemperature(float *d_temp, int w, int h, BC bc, dim3 M_in);
 
