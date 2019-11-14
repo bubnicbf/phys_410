@@ -15,6 +15,16 @@
 __host__ dev_Grid2d::dev_Grid2d( dim3 Ld_in) : Ld(Ld_in)
 {
 	checkCudaErrors(
+		cudaMalloc((void**)&this->dev_f_in, this->NFLAT()*sizeof(float) ) );
+
+	checkCudaErrors(
+		cudaMalloc((void**)&this->dev_f_out, this->NFLAT()*sizeof(float) ) );
+
+	checkCudaErrors(
+		cudaMalloc((void**)&this->dev_f_constsrc, this->NFLAT()*sizeof(float) ) );
+
+
+	checkCudaErrors(
 		cudaMalloc((void**)&this->dev_rho, this->NFLAT()*sizeof(float) ) );
 
 	checkCudaErrors(
@@ -39,17 +49,21 @@ __host__ dev_Grid2d::dev_Grid2d( dim3 Ld_in) : Ld(Ld_in)
 		cudaMalloc((void**)&this->dev_E_out, this->NFLAT()*sizeof(float) ) );
 
 	
-	(this->channelDesc_rho) = cudaCreateChannelDesc<float>();
-	checkCudaErrors(
-		cudaMallocArray(&(this->cuArr_rho), &(this->channelDesc_rho), (this->Ld).x, (this->Ld).y ) ); 
-
-	checkCudaErrors(
-		cudaMallocArray(&(this->cuArr_rho_out), &(this->channelDesc_rho), (this->Ld).x, (this->Ld).y ) ); 
-
 }
 
 // destructor
 __host__ dev_Grid2d::~dev_Grid2d() {
+
+	checkCudaErrors(
+		cudaFree( this->dev_f_in ) );
+
+	checkCudaErrors(
+		cudaFree( this->dev_f_out ) );
+
+	checkCudaErrors(
+		cudaFree( this->dev_f_constsrc ) );
+
+
 	checkCudaErrors(
 		cudaFree( this->dev_rho ) );
 
@@ -74,11 +88,6 @@ __host__ dev_Grid2d::~dev_Grid2d() {
 	checkCudaErrors(
 		cudaFree( this->dev_E_out ) );
 
-	checkCudaErrors(
-		cudaFreeArray( this->cuArr_rho ) );
-
-	checkCudaErrors(
-		cudaFreeArray( this->cuArr_rho_out ) );
 
 }
 

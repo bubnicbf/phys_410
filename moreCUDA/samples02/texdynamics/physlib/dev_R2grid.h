@@ -18,7 +18,11 @@ class dev_Grid2d
 {
 	public:
 		dim3 Ld;
-	
+
+		float *dev_f_in;
+		float *dev_f_out;
+		float *dev_f_constsrc;
+
 		float *dev_rho;
 		float *dev_rho_out;
 
@@ -30,10 +34,6 @@ class dev_Grid2d
 
 		float *dev_E;
 		float *dev_E_out;
-
-		cudaArray* cuArr_rho;
-		cudaArray* cuArr_rho_out;
-		cudaChannelFormatDesc channelDesc_rho;
 
 		// constructor
 		__host__ dev_Grid2d( dim3 );

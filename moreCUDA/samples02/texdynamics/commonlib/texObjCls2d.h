@@ -1,7 +1,10 @@
 /* texObjCls2d.h
  * texture memory Object class, 2-dim. 
  * Ernest Yeung  ernestyalumni@gmail.com
- * 20161115
+ * 20161116
+ * 
+ * cf. https://devblogs.nvidia.com/parallelforall/cuda-pro-tip-kepler-texture-objects-improve-performance-and-flexibility/
+ * M. Clark, CUDA Pro Tip: Kepler Texture Objects Improve Performance and Flexibility
  * 
  * compilation tip: (compile separately)
  * nvcc -std=c++11 -c ./commonlib/texObjCls2d.cu -o texObjCls2d.o
@@ -28,7 +31,7 @@ class TexObj2d
 
 		
 		// constructor
-		__host__ TexObj2d( cudaArray* cuArray ) ;
+		__host__ TexObj2d( float*, const int ) ;
 
 		// constructor
 		// Note: you're going to have to set the cudaArray this texture object is associated to at a later time.
