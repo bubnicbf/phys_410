@@ -12,6 +12,14 @@
  * 
  * */
 
+/*
+ * Compilation tip
+ * 
+ * g++ -lgsl -lgslcblas diffusion2dim.cpp -o diffusion2dim
+ * 
+ * */
+
+
 #include <iostream>
 #include <iomanip>  // std::setiosflags
 #include <gsl/gsl_matrix.h>  
