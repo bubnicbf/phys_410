@@ -79,25 +79,26 @@ using namespace thrust::placeholders; // _1, _2
 
 int main(int argc, char* argv[])
 {
-    // Initialize 2 vectors.
-    thrust::device_vector<float> a(4);
-    thrust::device_vector<float> b(4);
-    a[0] = 1.0; b[0] = 2.0;
-    a[1] = 2.0; b[1] = 4.0;
-    a[2] = 3.0; b[2] = 3.0;
-    a[3] = 4.0; b[3] = 0.0;
-    
-    // Compute the maximum squared difference.
-    float max_squared_diff = thrust::inner_product 
-    (
-        a.begin(), a.end(),         // Data range 1.
-        b.begin(),                  // Data range 2.
-        0,                          // Initial value for the reduction.
-        thrust::maximum<float>(),   // Binary operation used to reduce values.
-        (_1 - _2) * (_1 - _2)       // Lambda expression to compute squared difference.
-    );
-    
-    
-    // Print the result.
-    std::cout << max_squared_diff << std::endl;
+	// Initialize 2 vectors.
+	thrust::device_vector<float> a(4);
+	thrust::device_vector<float> b(4);
+	a[0] = 1.0; b[0] = 2.0;
+	a[1] = 2.0; b[1] = 4.0;
+	a[2] = 3.0; b[2] = 3.0;
+	a[3] = 4.0; b[3] = 0.0;
+	
+	// Compute the maximum squared difference.
+	float max_squared_diff = thrust::inner_product 
+	(
+		a.begin(), a.end(), 		// Data range 1.
+		b.begin(), 					// Data range 2.
+		0,							// Initial value for the reduction.
+		thrust::maximum<float>(), 	// Binary operation used to reduce values.
+		(_1 - _2) * (_1 - _2) 		// Lambda expression to compute squared difference.
+	);
+	
+	
+	// Print the result.
+	std::cout << max_squared_diff << std::endl;
 }
+

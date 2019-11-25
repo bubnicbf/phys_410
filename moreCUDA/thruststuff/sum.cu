@@ -24,28 +24,28 @@
 
 int my_rand(void)
 {
-    static thrust::default_random_engine rng;
-    static thrust::uniform_int_distribution<int> dist(0, 9999);
-    return dist(rng);
+	static thrust::default_random_engine rng;
+	static thrust::uniform_int_distribution<int> dist(0, 9999);
+	return dist(rng);
 }
 
 int main(int argc, char* argv[]) 
 {
-    // Generate random data on the host.
-    thrust::host_vector<int> h(100);
-    thrust::generate(h.begin(), h.end(), my_rand ) ; 
-    
-    // Copy data from host to device.
-    thrust::device_vector<int> d = h;
-    
-    // Compute sum on the device.
-    int sum = thrust::reduce
-    (
-        d.begin(), d.end(),     // Data range.
-        0,                      // Initial value of the reduction
-        thrust::plus<int>()     // Binary operation used to reduce values.
-    );
-    
-    // Print the sum.
-    std::cout << sum << std::endl;
+	// Generate random data on the host.
+	thrust::host_vector<int> h(100);
+	thrust::generate(h.begin(), h.end(), my_rand ) ; 
+	
+	// Copy data from host to device.
+	thrust::device_vector<int> d = h;
+	
+	// Compute sum on the device.
+	int sum = thrust::reduce
+	(
+		d.begin(), d.end(), 	// Data range.
+		0,						// Initial value of the reduction
+		thrust::plus<int>()		// Binary operation used to reduce values.
+	);
+	
+	// Print the sum.
+	std::cout << sum << std::endl;
 }

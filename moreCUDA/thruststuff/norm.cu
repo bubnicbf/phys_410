@@ -36,25 +36,26 @@ using namespace thrust::placeholders;  // _1, _2
 
 int main(int argc, char* argv[])
 {
-    // Initialize host data.
-    float h[4] = {1.0, 2.0, 3.0, 4.0};
-    
-    // Copy data from host to device.
-    thrust::device_vector<float> d(h, h + 4);
-    
-    
-    // Compute norm square.
-    float norm2 = thrust::transform_reduce
-    (
-        d.begin(), d.end(),     // Data range
-        _1 * _1,                // Unary transform operation.
-        0,                      // Initial value of the reduction.
-        thrust::plus<float>()           // Binary operation used to reduce values.
-    );
-    
-    // Compute norm.
-    float norm = std::sqrt(norm2);
-    
-    // Print the norm.
-    std::cout << norm << std::endl;
+	// Initialize host data.
+	float h[4] = {1.0, 2.0, 3.0, 4.0};
+	
+	// Copy data from host to device.
+	thrust::device_vector<float> d(h, h + 4);
+	
+	
+	// Compute norm square.
+	float norm2 = thrust::transform_reduce
+	(
+		d.begin(), d.end(),  	// Data range
+		_1 * _1, 				// Unary transform operation.
+		0,						// Initial value of the reduction.
+		thrust::plus<float>()			// Binary operation used to reduce values.
+	);
+	
+	// Compute norm.
+	float norm = std::sqrt(norm2);
+	
+	// Print the norm.
+	std::cout << norm << std::endl;
 }
+

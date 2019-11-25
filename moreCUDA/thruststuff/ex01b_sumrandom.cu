@@ -26,21 +26,21 @@
 
 int main(void)
 {
-    // generate random data serially
-    thrust::host_vector<int> h_vec(100);
-    std::generate(h_vec.begin(), h_vec.end(), rand);
+	// generate random data serially
+	thrust::host_vector<int> h_vec(100);
+	std::generate(h_vec.begin(), h_vec.end(), rand);
 
-    std::cout << " These are the first 10 values of the randomly generated h_vec " << std::endl;
-    for (int i = 0; i<10; ++i) {
-        std::cout << " The ith value, i : " << i << " value : " << h_vec[i] << std::endl; 
-    }
+	std::cout << " These are the first 10 values of the randomly generated h_vec " << std::endl;
+	for (int i = 0; i<10; ++i) {
+		std::cout << " The ith value, i : " << i << " value : " << h_vec[i] << std::endl; 
+	}
 
-    // transfer to device and compute sum
-    thrust::device_vector<int> d_vec = h_vec;
-    int x = thrust::reduce(d_vec.begin(), d_vec.end(), 0, thrust::plus<int>());
+	// transfer to device and compute sum
+	thrust::device_vector<int> d_vec = h_vec;
+	int x = thrust::reduce(d_vec.begin(), d_vec.end(), 0, thrust::plus<int>());
 
-    std::cout << " This is the result of the summation, x : " << x << std::endl; 
-    return 0;
-    
+	std::cout << " This is the result of the summation, x : " << x << std::endl; 
+	return 0;
+	
 }
  
