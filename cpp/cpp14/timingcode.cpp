@@ -13,24 +13,24 @@ using namespace std;
 
 int main() {
 
-    // cf. http://en.cppreference.com/w/cpp/chrono/system_clock
-    cout << "system_clock" << endl;
-    cout << chrono::system_clock::period::num << endl;
-    cout << chrono::system_clock::period::den << endl;
-    cout << "steady = " << boolalpha << chrono::system_clock::is_steady << endl << endl;
-    
-    cout << "high_resolution_clock" << endl;
-    cout << chrono::high_resolution_clock::period::num << endl;
-    cout << chrono::high_resolution_clock::period::den << endl;
-    cout << "steady = " << boolalpha << chrono::high_resolution_clock::is_steady << endl << endl;
+	// cf. http://en.cppreference.com/w/cpp/chrono/system_clock
+	cout << "system_clock" << endl;
+	cout << chrono::system_clock::period::num << endl;
+	cout << chrono::system_clock::period::den << endl;
+	cout << "steady = " << boolalpha << chrono::system_clock::is_steady << endl << endl;
+	
+	cout << "high_resolution_clock" << endl;
+	cout << chrono::high_resolution_clock::period::num << endl;
+	cout << chrono::high_resolution_clock::period::den << endl;
+	cout << "steady = " << boolalpha << chrono::high_resolution_clock::is_steady << endl << endl;
 
-    cout << "steady_clock" << endl;
-    cout << chrono::steady_clock::period::num << endl;
-    cout << chrono::steady_clock::period::den << endl;
-    cout << "steady = " << boolalpha << chrono::steady_clock::is_steady << endl << endl;
-    
-    return 0;
-    
+	cout << "steady_clock" << endl;
+	cout << chrono::steady_clock::period::num << endl;
+	cout << chrono::steady_clock::period::den << endl;
+	cout << "steady = " << boolalpha << chrono::steady_clock::is_steady << endl << endl;
+	
+	return 0;
+	
 }
 // For measuring execution time of a piece of code, use the now() function and drop this code in:
 

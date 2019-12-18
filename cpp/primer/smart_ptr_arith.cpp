@@ -1,7 +1,7 @@
 /**
  * @file   : smart_ptr_arith.cpp
  * @brief  : Smart pointer (shared and unique ptrs) arithmetic, in C++14  
- * @author : Ernest Yeung   ernestyalumni@gmail.com
+ * @author : Ernest Yeung	ernestyalumni@gmail.com
  * @date   : 20170904
  * @ref    : http://en.cppreference.com/w/cpp/memory/unique_ptr
  *         : Stanley B. Lippman, Josee Lajoie, Barbara E. Moo.  C++ Primer, Fifth Edition.  Sec. 3.5, Ch. 12 
@@ -16,7 +16,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 

@@ -1,15 +1,15 @@
 /**
  * @file   : FileIObin_playground.cpp
  * @brief  : Playground for Examples to demonstrate binary file IO in C/C++, especially C++11/14
- *          : since there's many new C++11/14 features  
+ * 			: since there's many new C++11/14 features  
  * @author : Ernest Yeung <ernestyalumni@gmail.com>
  * @date   : 20170913
  * @ref    : https://stackoverflow.com/questions/11563963/writing-a-binary-file-in-c-very-fast
- *              Writing a binary file in C++ very fast
- *          : http://en.cppreference.com/w/cpp/types/integer
- *              Fixed width integer types (since C++11)
- *          : http://en.cppreference.com/w/cpp/types/size_t
- *              std::size_t
+ * 				Writing a binary file in C++ very fast
+ * 			: http://en.cppreference.com/w/cpp/types/integer
+ * 				Fixed width integer types (since C++11)
+ * 			: http://en.cppreference.com/w/cpp/types/size_t
+ * 				std::size_t
  * 
  * If you find this code useful, feel free to donate directly and easily at this direct PayPal link: 
  * 
@@ -22,7 +22,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
@@ -34,24 +34,24 @@
  * */
  
 // I confirmed that std::size_t belongs in cstdint, even though http://en.cppreference.com/w/cpp/types/size_t doesn't say so
-#include <cstdint>      // std::uint64_t, std::int64_T, std::sizeof
-#include <iostream>     // std::cout
+#include <cstdint> 		// std::uint64_t, std::int64_T, std::sizeof
+#include <iostream>		// std::cout
 
 int main(int argc, char **argv) {
-    std::cout << " sizeof(std::uint64_t) : " << sizeof(std::uint64_t) << std::endl;     // 8
-    std::cout << " sizeof(std::int64_t)  : " << sizeof(std::int64_t) << std::endl;      // 8
+	std::cout << " sizeof(std::uint64_t) : " << sizeof(std::uint64_t) << std::endl;		// 8
+	std::cout << " sizeof(std::int64_t)  : " << sizeof(std::int64_t) << std::endl;		// 8
 
-    // cf. http://en.cppreference.com/w/cpp/types/size_t
-    const std::size_t N = 10; 
-    int * a = new int[N];
-    
-    for (std::size_t n=0; n< N; ++n) { a[n] = n; }
-    for (std::size_t n=N; n-- > 0;) // Reverse cycles are tricky for unsigned types.  
-        std::cout << a[n] << " ";
-    
-    /*
-     * https://stackoverflow.com/questions/28338775/what-is-iosiniosout
-     * 
+	// cf. http://en.cppreference.com/w/cpp/types/size_t
+	const std::size_t N = 10; 
+	int * a = new int[N];
+	
+	for (std::size_t n=0; n< N; ++n) { a[n] = n; }
+	for (std::size_t n=N; n-- > 0;) // Reverse cycles are tricky for unsigned types.  
+		std::cout << a[n] << " ";
+	
+	/*
+	 * https://stackoverflow.com/questions/28338775/what-is-iosiniosout
+	 * 
 
     ios::in allows input (read operations) from a stream.
     ios::out allows output (write operations) to a stream.
@@ -67,13 +67,13 @@ Important things to note:
     set. That's why they're explicitly set in your example code.
 
 
-     * */
-     
-     
-    
-    
-    // free any resources
-    delete[] a;
-    
-    return 0;
+	 * */
+	 
+	 
+	
+	
+	// free any resources
+	delete[] a;
+	
+	return 0;
 }
