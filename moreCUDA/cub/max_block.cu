@@ -13,7 +13,7 @@
  * helped students with their studies, and I know what it's like to not have money as a student, but love physics 
  * (or math, sciences, etc.), so I am committed to keeping all my material open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.    
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.    
  * Peace out, never give up! -EY
  * 
  * */
@@ -71,7 +71,7 @@
     int BLOCK_DIM_Z = 1, 
     int PTX_ARCH = CUB_PTX_ARCH>
 
-    class cub::BlockReduce< T, BLOCK_DIM_X, ALGORITHM, BLOCK_DIM_Y, BLOCK_DIM_Z, PTX_ARCH >
+	class cub::BlockReduce< T, BLOCK_DIM_X, ALGORITHM, BLOCK_DIM_Y, BLOCK_DIM_Z, PTX_ARCH >
  * */
 
 
@@ -90,61 +90,61 @@ cub::CachingDeviceAllocator dev_allocator(true);  // Caching allocator for devic
 template <int M_x, cub::BlockReduceAlgorithm ALGORITHM>  // M_x is BLOCK_SIZE or number of threads in a single block
 __global__ void maxKernel(int* d_max, int* d_input)
 {
-    int k_x = threadIdx.x + blockDim.x * blockIdx.x ; 
-    
-    // Specialize BlockReduce type for our thread block
-    using BlockReduceT = cub::BlockReduce<int,M_x,ALGORITHM> ;
-    
-    // Allocate temporary storage in shared memory
-    
-    // In a template declaration, typename can be used as an alternative to class to declare type template parameters 
-    // cf. http://en.cppreference.com/w/cpp/keyword/typename
-    __shared__ typename BlockReduceT::TempStorage temp_storage ;
+	int k_x = threadIdx.x + blockDim.x * blockIdx.x ; 
+	
+	// Specialize BlockReduce type for our thread block
+	using BlockReduceT = cub::BlockReduce<int,M_x,ALGORITHM> ;
+	
+	// Allocate temporary storage in shared memory
+	
+	// In a template declaration, typename can be used as an alternative to class to declare type template parameters 
+	// cf. http://en.cppreference.com/w/cpp/keyword/typename
+	__shared__ typename BlockReduceT::TempStorage temp_storage ;
 /* cf. https://nvlabs.github.io/cub/structcub_1_1_block_reduce_1_1_temp_storage.html
  * cub::BlockReduce< T, BLOCK_DIM_X, ALGORITHM, BLOCK_DIM_Y, BLOCK_DIM_Z, PTX_ARCH >::TempStorage Struct Reference
  * The operations exposed by BlockReduce require a temporary memory allocation of this nested type 
  * for thread communication. 
  * This opaque storage can be allocated directly using the __shared__ keyword. */
  
-    int val = d_input[k_x];
-    int block_max = BlockReduceT(temp_storage).Reduce(val,cub::Max());
-    
-    // update global max value
-    if (threadIdx.x == 0) {
-        atomicMax(d_max,block_max);
-    }
-    
-    return;
+	int val = d_input[k_x];
+	int block_max = BlockReduceT(temp_storage).Reduce(val,cub::Max());
+	
+	// update global max value
+	if (threadIdx.x == 0) {
+		atomicMax(d_max,block_max);
+	}
+	
+	return;
 }
 
 // cf. https://www.microway.com/hpc-tech-tips/introducing-cuda-unbound-cub/ Optimizing performance by limiting concurrency
 template <int VALS_PER_THREAD, 
-            int BLOCK_SIZE, // aka M_x aka BLOCK_THREADS
-            cub::BlockReduceAlgorithm ALGORITHM>
+			int BLOCK_SIZE, // aka M_x aka BLOCK_THREADS
+			cub::BlockReduceAlgorithm ALGORITHM>
 __global__ void maxKernel_opt(int* d_max, int* d_input)
 {
-    int k_x = threadIdx.x + blockDim.x * blockIdx.x;
-    
-    // Special BlockReduce type for our thread block
-    using BlockReduceT = cub::BlockReduce<int, BLOCK_SIZE, ALGORITHM>;
-    
-    // Allocate temporary storage in shared memory
-    __shared__ typename BlockReduceT::TempStorage temp_storage;
-    
-    // Assign multiple values to each block thread
-    int val[VALS_PER_THREAD];
-    
-    // Code to initialize the val array has been omitted originally, so I'm guessing it's like this from 
-    // example_block_reduce.cu
-    cub::LoadDirectStriped<BLOCK_SIZE>(threadIdx.x, d_input, val);
-    
-    int block_max = BlockReduceT(temp_storage).Reduce(val,cub::Max());
-    
-    // update global max value
-    if (threadIdx.x == 0) {
-        atomicMax(d_max,block_max);
-    }
-    return;
+	int k_x = threadIdx.x + blockDim.x * blockIdx.x;
+	
+	// Special BlockReduce type for our thread block
+	using BlockReduceT = cub::BlockReduce<int, BLOCK_SIZE, ALGORITHM>;
+	
+	// Allocate temporary storage in shared memory
+	__shared__ typename BlockReduceT::TempStorage temp_storage;
+	
+	// Assign multiple values to each block thread
+	int val[VALS_PER_THREAD];
+	
+	// Code to initialize the val array has been omitted originally, so I'm guessing it's like this from 
+	// example_block_reduce.cu
+	cub::LoadDirectStriped<BLOCK_SIZE>(threadIdx.x, d_input, val);
+	
+	int block_max = BlockReduceT(temp_storage).Reduce(val,cub::Max());
+	
+	// update global max value
+	if (threadIdx.x == 0) {
+		atomicMax(d_max,block_max);
+	}
+	return;
 }
 
 
@@ -152,125 +152,125 @@ __global__ void maxKernel_opt(int* d_max, int* d_input)
 //__global__ void 
 
 int main() {
-    
-    /* boilerplate */
-    // initiate correct GPU
-    int deviceCount;
-    cudaGetDeviceCount(&deviceCount);
-    if (deviceCount == 0) {
-        exit(EXIT_FAILURE);
-    }
-    int dev = 0;
-    cudaSetDevice(dev);
-    
-    cudaDeviceProp devProps;
-    if (cudaGetDeviceProperties(&devProps, dev) == 0) {
-        std::cout << " Using device " << dev << ":\n" ;
-        std::cout << devProps.name << "; global mem: " << (int)devProps.totalGlobalMem <<
-            "; compute v" << (int)devProps.major << "." << (int)devProps.minor << "; clock: " <<
-            (int)devProps.clockRate << " kHz" << std::endl; }
-    // END if GPU properties
+	
+	/* boilerplate */
+	// initiate correct GPU
+	int deviceCount;
+	cudaGetDeviceCount(&deviceCount);
+	if (deviceCount == 0) {
+		exit(EXIT_FAILURE);
+	}
+	int dev = 0;
+	cudaSetDevice(dev);
+	
+	cudaDeviceProp devProps;
+	if (cudaGetDeviceProperties(&devProps, dev) == 0) {
+		std::cout << " Using device " << dev << ":\n" ;
+		std::cout << devProps.name << "; global mem: " << (int)devProps.totalGlobalMem <<
+			"; compute v" << (int)devProps.major << "." << (int)devProps.minor << "; clock: " <<
+			(int)devProps.clockRate << " kHz" << std::endl; }
+	// END if GPU properties
 
-//  CubDebugExit( cudaDeviceSynchronize() );
-    
-    /**
-     *******************************************************************
-     * Further BOILERPLATE
-     ******************************************************************/
-    // how many array entries?  n = ?  for block reduce, it maxes out at the hardware's max number of threads in a block
-//  int N_x = 32; // BLOCK_THREADS
-//  int M_x = 32; // ITEMS_PER_THREAD
+//	CubDebugExit( cudaDeviceSynchronize() );
+	
+	/**
+	 *******************************************************************
+	 * Further BOILERPLATE
+	 ******************************************************************/
+	// how many array entries?  n = ?  for block reduce, it maxes out at the hardware's max number of threads in a block
+//	int N_x = 32; // BLOCK_THREADS
+//	int M_x = 32; // ITEMS_PER_THREAD
 
-    constexpr int n = 1024;  // "TILE_SIZE"
-    
-     // Initialization (on host CPU)
-    std::vector<int> x(n); // test a LARGE histogram; input values or observations 
+	constexpr int n = 1024;  // "TILE_SIZE"
+	
+	 // Initialization (on host CPU)
+	std::vector<int> x(n); // test a LARGE histogram; input values or observations 
 
-    int j = 0;
-    // see all the different ways to use for_each to initiate and increment, with for_each, a std::vector
-    std::for_each(x.begin(), x.end(), [&j](int &value) { value = j++; });
-    std::for_each(x.begin(), x.end(), [](int &n){ n++; });
+	int j = 0;
+	// see all the different ways to use for_each to initiate and increment, with for_each, a std::vector
+	std::for_each(x.begin(), x.end(), [&j](int &value) { value = j++; });
+	std::for_each(x.begin(), x.end(), [](int &n){ n++; });
 
-    std::vector<int>::const_iterator it = x.begin();
-    std::for_each(x.begin(), x.end(), [&it](int &value) { value = *(++it) ; } );
-    
-    // use std::random_shuffle to permute order of the elements 
-    std::random_shuffle( x.begin(), x.end() ) ; 
-    
-    // sanity check
-    std::cout << " max element of x : " << 
-        *(std::max_element( x.begin(), x.end() ) ) << std::endl;
+	std::vector<int>::const_iterator it = x.begin();
+	std::for_each(x.begin(), x.end(), [&it](int &value) { value = *(++it) ; } );
+	
+	// use std::random_shuffle to permute order of the elements 
+	std::random_shuffle( x.begin(), x.end() ) ; 
+	
+	// sanity check
+	std::cout << " max element of x : " << 
+		*(std::max_element( x.begin(), x.end() ) ) << std::endl;
 
-    
-    // Allocate problem device arrays
-    int     *dev_dat = nullptr;  // NULL, otherwise for nullptr, you're going to need the -std=c++11 flag for compilation
-    int   *dev_max;
+	
+	// Allocate problem device arrays
+	int 	*dev_dat = nullptr;  // NULL, otherwise for nullptr, you're going to need the -std=c++11 flag for compilation
+	int   *dev_max;
 
-//  int *dev_i_dat = nullptr; 
-    
-    /* Allocate n ints on device */
+//	int *dev_i_dat = nullptr; 
+	
+	/* Allocate n ints on device */
     CubDebugExit(dev_allocator.DeviceAllocate((void**)&dev_dat, sizeof(int) * (n) ));
     CubDebugExit(dev_allocator.DeviceAllocate((void**)&dev_max, sizeof(int)  ));
 
 //    CubDebugExit(dev_allocator.DeviceAllocate((void**)&dev_i_dat, sizeof(int) * n  ));
 
 
-    CubDebugExit(cudaMemcpy(dev_dat, x.data(), sizeof(int) * (n), cudaMemcpyHostToDevice));
+	CubDebugExit(cudaMemcpy(dev_dat, x.data(), sizeof(int) * (n), cudaMemcpyHostToDevice));
 
-    // Boilerplate to make random device arrays
+	// Boilerplate to make random device arrays
 
-    /* Create pseudo-random number generator */
-//  curandGenerator_t gen;
-//  curandCreateGenerator(&gen,CURAND_RNG_PSEUDO_DEFAULT);
-        
-    /* Set seed */
-//  curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
-    
-    /* Generate n ints on device  */
-//  curandGeneratePoisson( gen, dev_i_dat, n , 1.); // lambda
+	/* Create pseudo-random number generator */
+//	curandGenerator_t gen;
+//	curandCreateGenerator(&gen,CURAND_RNG_PSEUDO_DEFAULT);
+		
+	/* Set seed */
+//	curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
+	
+	/* Generate n ints on device  */
+//	curandGeneratePoisson( gen, dev_i_dat, n , 1.); // lambda
 
 
-    /** ******************************************************************** 
-        * END of device GPU boilerplate
-        * */
+	/** ******************************************************************** 
+		* END of device GPU boilerplate
+		* */
 
-    
-    maxKernel<n,cub::BLOCK_REDUCE_RAKING><<<1, n>>>( 
-                                                        dev_max, 
-                                                        dev_dat);
-    
-    // generate output array on host
-    int h_max = 0;
-    
-    /* Copy device memory to host */
-    CubDebugExit(cudaMemcpy(&h_max, dev_max, sizeof(int) , cudaMemcpyDeviceToHost));
-    std::cout << "dev_max (after BlockReduce with BLOCK_REDUCE_RAKING) : " << h_max << std::endl;
-    
-    
-    // Check for kernel errors and STDIO from the kernel, if any
-    CubDebugExit( cudaPeekAtLastError());
-    CubDebugExit( cudaDeviceSynchronize());
+	
+	maxKernel<n,cub::BLOCK_REDUCE_RAKING><<<1, n>>>( 
+														dev_max, 
+														dev_dat);
+	
+	// generate output array on host
+	int h_max = 0;
+	
+	/* Copy device memory to host */
+	CubDebugExit(cudaMemcpy(&h_max, dev_max, sizeof(int) , cudaMemcpyDeviceToHost));
+	std::cout << "dev_max (after BlockReduce with BLOCK_REDUCE_RAKING) : " << h_max << std::endl;
+	
+	
+	// Check for kernel errors and STDIO from the kernel, if any
+	CubDebugExit( cudaPeekAtLastError());
+	CubDebugExit( cudaDeviceSynchronize());
 
-    maxKernel_opt<32,32,cub::BLOCK_REDUCE_WARP_REDUCTIONS><<<1,n>>>( dev_max, dev_dat) ;
+	maxKernel_opt<32,32,cub::BLOCK_REDUCE_WARP_REDUCTIONS><<<1,n>>>( dev_max, dev_dat) ;
 
-    /* Copy device memory to host */
-    CubDebugExit(cudaMemcpy(&h_max, dev_max, sizeof(int) , cudaMemcpyDeviceToHost));
-    std::cout << "dev_max (after BlockReduce with BLOCK_REDUCE_WARP_REDUCTIONS) : " << h_max << std::endl;
+	/* Copy device memory to host */
+	CubDebugExit(cudaMemcpy(&h_max, dev_max, sizeof(int) , cudaMemcpyDeviceToHost));
+	std::cout << "dev_max (after BlockReduce with BLOCK_REDUCE_WARP_REDUCTIONS) : " << h_max << std::endl;
 
-    // Check for kernel errors and STDIO from the kernel, if any
-    CubDebugExit( cudaPeekAtLastError());
-    CubDebugExit( cudaDeviceSynchronize());
-    
-    
-    /* Clean up */
+	// Check for kernel errors and STDIO from the kernel, if any
+	CubDebugExit( cudaPeekAtLastError());
+	CubDebugExit( cudaDeviceSynchronize());
+	
+	
+	/* Clean up */
     if (dev_dat) CubDebugExit(dev_allocator.DeviceFree(dev_dat));
-    if (dev_max) CubDebugExit(dev_allocator.DeviceFree(dev_max));
-//  if (dev_i_dat) CubDebugExit(dev_allocator.DeviceFree(dev_i_dat));
+	if (dev_max) CubDebugExit(dev_allocator.DeviceFree(dev_max));
+//	if (dev_i_dat) CubDebugExit(dev_allocator.DeviceFree(dev_i_dat));
 
 
-//  CubDebugExit( cudaDeviceReset() );
+//	CubDebugExit( cudaDeviceReset() );
 
-    return 0;
+	return 0;
 }
 
 
@@ -280,8 +280,8 @@ int main() {
 
 
 
-    
-    
-    
-    
-    
+	
+	
+	
+	
+	

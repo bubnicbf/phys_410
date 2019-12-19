@@ -14,7 +14,7 @@
  * helped students with their studies, and I know what it's like to not have money as a student, but love physics 
  * (or math, sciences, etc.), so I am committed to keeping all my material open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.    
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.    
  * Peace out, never give up! -EY
  * 
  * */
@@ -34,44 +34,44 @@
 #include "cublas_v2.h"
 
 
-#define n 6                                     // length of x
+#define n 6 									// length of x
 int main(void) {
-    cudaError_t cudaStat;                       // cudaMalloc status
-    cublasStatus_t stat;                        // CUBLAS functions status
-    cublasHandle_t handle;                      // CUBLAS context
-    int j;                                      // index of elements
-    float* x;                                   // n-vector on the host
-    x=(float *)malloc (n*sizeof(*x));           // host memory alloc
-    for (j=0;j<n;j++)
-        x[j]=(float) j;                         // x={0,1,2,3,4,5}
-    printf("x: ");
-    for(j=0;j<n;j++)
-        printf("%4.0f,",x[j]);                  // print x
-    printf("\n");
-    // on the device
-    float* d_x;                                 // d_x - x on the device
-    cudaStat=cudaMalloc((void**)&d_x,n*sizeof(*x));     // device
-                                                // memory alloc for x
-    stat = cublasCreate(&handle);               // initialize CUBLAS context
-    stat = cublasSetVector(n,sizeof(*x),x,1,d_x,1);     // cp x -> d_x
-    int result;                                 // index of the maximal/minimal element
-    // find the smallest index of the element of d_x with maximum
-    // absolute value
-    
-    stat=cublasIsamax(handle,n,d_x,1,&result);
-    printf("max |x[i]|:%4.0f\n",fabs(x[result-1])); // print 
-                                                // max{|x[0]|,...,|x[n-1]|}
-    // find the smallest index of the element of d_x with minimum
-    // absolute value
+	cudaError_t cudaStat; 						// cudaMalloc status
+	cublasStatus_t stat; 						// CUBLAS functions status
+	cublasHandle_t handle; 						// CUBLAS context
+	int j;										// index of elements
+	float* x;									// n-vector on the host
+	x=(float *)malloc (n*sizeof(*x)); 			// host memory alloc
+	for (j=0;j<n;j++)
+		x[j]=(float) j;							// x={0,1,2,3,4,5}
+	printf("x: ");
+	for(j=0;j<n;j++)
+		printf("%4.0f,",x[j]);					// print x
+	printf("\n");
+	// on the device
+	float* d_x;									// d_x - x on the device
+	cudaStat=cudaMalloc((void**)&d_x,n*sizeof(*x)); 	// device
+												// memory alloc for x
+	stat = cublasCreate(&handle); 				// initialize CUBLAS context
+	stat = cublasSetVector(n,sizeof(*x),x,1,d_x,1); 	// cp x -> d_x
+	int result; 								// index of the maximal/minimal element
+	// find the smallest index of the element of d_x with maximum
+	// absolute value
+	
+	stat=cublasIsamax(handle,n,d_x,1,&result);
+	printf("max |x[i]|:%4.0f\n",fabs(x[result-1])); // print 
+												// max{|x[0]|,...,|x[n-1]|}
+	// find the smallest index of the element of d_x with minimum
+	// absolute value
 
-    stat=cublasIsamin(handle,n,d_x,1,&result);
-    
-    printf("min |x[i]|:%4.0f\n",fabs(x[result-1]));             // print
-                                                // min{|x[0]|,...,|x[n-1]|
-    cudaFree(d_x);                              // free device memory
-    cublasDestroy(handle);                      // destroy CUBLAS context
-    free(x);                                    // free host memory
-    return EXIT_SUCCESS;
+	stat=cublasIsamin(handle,n,d_x,1,&result);
+	
+	printf("min |x[i]|:%4.0f\n",fabs(x[result-1])); 			// print
+												// min{|x[0]|,...,|x[n-1]|
+	cudaFree(d_x);								// free device memory
+	cublasDestroy(handle); 						// destroy CUBLAS context
+	free(x);									// free host memory
+	return EXIT_SUCCESS;
 }
 // x: 0, 1, 2, 3, 4, 5,
 // max |x[i]|:  5

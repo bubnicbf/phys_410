@@ -2,7 +2,7 @@
  * @name : Ex01_singleprocess.cu
  * @ref  : http://docs.nvidia.com/deeplearning/sdk/nccl-developer-guide/index.html#singleprothrdmultidev  
  * @note : COMPILATION TIPS:
- *          nvcc -std=c++11 -I ~/nccl/include -L ~/nccl/lib -lnccl Ex01_singleprocess.cu -o Ex01_singleprocess.ex 
+ *			nvcc -std=c++11 -I ~/nccl/include -L ~/nccl/lib -lnccl Ex01_singleprocess.cu -o Ex01_singleprocess.ex 
  * */
  /* 
  * COMPILATION TIP
@@ -45,14 +45,14 @@ collect2: error: ld returned 1 exit status
 
 int main(int argc, char* argv[])
 {
-    /*
+	/*
   ncclComm_t comms[4];
 
-  //managing 4 devices    
+  //managing 4 devices	  
   int nDev = 4;
   int size = 32*1024*1024;
   int devs[4] = { 0, 1, 2, 3 };
-    */
+	*/
 
   // managing 1 device
   ncclComm_t comms[1];
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   cudaStream_t* s = (cudaStream_t*)malloc(sizeof(cudaStream_t)*nDev);
 
   for (int i = 0; i < nDev; ++i) {
-    printf(" \n i : %d \n ", i );
+	printf(" \n i : %d \n ", i );
     CUDACHECK(cudaSetDevice(i));
     CUDACHECK(cudaMalloc(sendbuff + i, size * sizeof(float)));
     CUDACHECK(cudaMalloc(recvbuff + i, size * sizeof(float)));
@@ -77,13 +77,13 @@ int main(int argc, char* argv[])
     CUDACHECK(cudaStreamCreate(s+i));
   }
 
-    cudaDeviceSynchronize();
+	cudaDeviceSynchronize();
 
-    // read the input 
-    std::vector<float> f_vec(size,1.f);
-    cudaMemcpy(sendbuff[0], f_vec.data(), size*sizeof(float), cudaMemcpyHostToDevice);
-    printf(" f_vec[0] : %f , f_vec[1] : %f , f_vec[size-2] : %f , f_vec[size-1] : %f \n ", 
-        f_vec[0], f_vec[1], f_vec[size-2], f_vec[size-1] ); 
+	// read the input 
+	std::vector<float> f_vec(size,1.f);
+	cudaMemcpy(sendbuff[0], f_vec.data(), size*sizeof(float), cudaMemcpyHostToDevice);
+	printf(" f_vec[0] : %f , f_vec[1] : %f , f_vec[size-2] : %f , f_vec[size-1] : %f \n ", 
+		f_vec[0], f_vec[1], f_vec[size-2], f_vec[size-1] );	
 
 
   //initializing NCCL
@@ -91,13 +91,13 @@ int main(int argc, char* argv[])
 
   //calling NCCL communication API. Group API is required when using
   //multiple devices per thread
-    NCCLCHECK(ncclGroupStart());
-    for (int i = 0; i < nDev; ++i) {
-        printf(" \n i : %d \n ", i );
-        NCCLCHECK(ncclAllReduce((const void*)sendbuff[i], (void*)recvbuff[i], size, ncclFloat, ncclSum,
-                                    comms[i], s[i])); 
-    }
-    NCCLCHECK(ncclGroupEnd());
+	NCCLCHECK(ncclGroupStart());
+	for (int i = 0; i < nDev; ++i) {
+		printf(" \n i : %d \n ", i );
+		NCCLCHECK(ncclAllReduce((const void*)sendbuff[i], (void*)recvbuff[i], size, ncclFloat, ncclSum,
+									comms[i], s[i])); 
+	}
+	NCCLCHECK(ncclGroupEnd());
 
   //synchronizing on CUDA streams to wait for completion of NCCL operation
   for (int i = 0; i < nDev; ++i) {
@@ -105,12 +105,12 @@ int main(int argc, char* argv[])
     CUDACHECK(cudaStreamSynchronize(s[i]));
   }
 
-    // read the output 
-    std::vector<float> g_vec(size,0.f);
-    
-    cudaMemcpy(g_vec.data(), recvbuff[0], size*sizeof(float), cudaMemcpyDeviceToHost);
-    printf(" g_vec[0] : %f , g_vec[1] : %f , g_vec[size-2] : %f , g_vec[size-1] : %f \n ", 
-        g_vec[0], g_vec[1], g_vec[size-2], g_vec[size-1] ); 
+	// read the output 
+	std::vector<float> g_vec(size,0.f);
+	
+	cudaMemcpy(g_vec.data(), recvbuff[0], size*sizeof(float), cudaMemcpyDeviceToHost);
+	printf(" g_vec[0] : %f , g_vec[1] : %f , g_vec[size-2] : %f , g_vec[size-1] : %f \n ", 
+		g_vec[0], g_vec[1], g_vec[size-2], g_vec[size-1] );	
 
 
 
@@ -128,3 +128,4 @@ int main(int argc, char* argv[])
   printf("Success \n");
   return 0;
 }
+

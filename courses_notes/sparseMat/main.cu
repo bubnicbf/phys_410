@@ -2,7 +2,7 @@
  * @file   : main.cu
  * @brief  : Sparse Matrices using CUDA Unified Memory, but for Compute Capability 5.X; "main" file (execute the written functions, classes here in this file)  
  * uses CUDA Unified Memory (Management)
- * @author : Ernest Yeung   ernestyalumni@gmail.com
+ * @author : Ernest Yeung	ernestyalumni@gmail.com
  * @date   : 20170525
  * @ref    :  cf. https://www5.in.tum.de/lehre/vorlesungen/hpc/WS16/tutorial/sparse_02.pdf
  * 
@@ -17,7 +17,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
@@ -43,55 +43,56 @@ __device__ __managed__ float x[N2] = {1.f,2.f,3.f,4.f,5.f,6.f};
 __device__ __managed__ float y[N];
 
 int main(int argc, char* argv[]) {
-    for (int idx=0; idx<K; idx++) {
-        std::cout << A[idx] << " "; }
-    std::cout << std::endl << std::endl;
+	for (int idx=0; idx<K; idx++) {
+		std::cout << A[idx] << " "; }
+	std::cout << std::endl << std::endl;
 
-    for (int idx=0;idx<N+1;idx++) {
-        std::cout << IA[idx] << " " ; }
+	for (int idx=0;idx<N+1;idx++) {
+		std::cout << IA[idx] << " " ; }
 
-    constexpr const int TILESIZE=2;
-    CSR_MatVecMultiply<float><<<dim3((N+TILESIZE-1)/TILESIZE),dim3(TILESIZE)>>>(A,x,y,JA,IA,N);
-    cudaThreadSynchronize();
-    
-        // sanity check : printout
-        /* you can only do the following commented out code for Compute Capability 6.X and higher!  
-         * Please help me with obtaining a GTX 1080 Ti by donating at the PayPal link above so I can do so! -EY *//*
+	constexpr const int TILESIZE=2;
+	CSR_MatVecMultiply<float><<<dim3((N+TILESIZE-1)/TILESIZE),dim3(TILESIZE)>>>(A,x,y,JA,IA,N);
+	cudaThreadSynchronize();
+	
+		// sanity check : printout
+		/* you can only do the following commented out code for Compute Capability 6.X and higher!  
+		 * Please help me with obtaining a GTX 1080 Ti by donating at the PayPal link above so I can do so! -EY *//*
 /*
-    for (int idx=0; idx<N; idx++) {
-        std::cout << y[idx] << " "; }
-    std::cout << std::endl << std::endl;
+	for (int idx=0; idx<N; idx++) {
+		std::cout << y[idx] << " "; }
+	std::cout << std::endl << std::endl;
 */
-    
-        // with Compute Capability 5.X you must do this:
-    float host_y[N];
-    cudaMemcpy(host_y, y, sizeof(float) * N, cudaMemcpyDeviceToHost);  
-    std::cout << " y : " << std::endl;
-    for (int iidx =0; iidx < N; iidx++) { 
-        float y_j = host_y[iidx] ;
-        std::cout << y_j << " "; 
-    }
-    
-    std::cout << std::endl << std::endl; 
+	
+		// with Compute Capability 5.X you must do this:
+	float host_y[N];
+	cudaMemcpy(host_y, y, sizeof(float) * N, cudaMemcpyDeviceToHost);  
+	std::cout << " y : " << std::endl;
+	for (int iidx =0; iidx < N; iidx++) { 
+		float y_j = host_y[iidx] ;
+		std::cout << y_j << " "; 
+	}
+	
+	std::cout << std::endl << std::endl; 
 
 
-            // Reset host_y to 0 for the next computation
-    for (int iidx =0; iidx < N; iidx++) { 
-        host_y[iidx] =0.f;
-    }
-    cudaMemcpy(y,host_y, sizeof(float) * N, cudaMemcpyHostToDevice);  
+			// Reset host_y to 0 for the next computation
+	for (int iidx =0; iidx < N; iidx++) { 
+		host_y[iidx] =0.f;
+	}
+	cudaMemcpy(y,host_y, sizeof(float) * N, cudaMemcpyHostToDevice);  
 
-    constexpr const int WARPSIZE=32;
-    CSR_MatVecMultiply_Warped<float,TILESIZE><<<dim3((N*WARPSIZE+TILESIZE-1)/TILESIZE),dim3(TILESIZE)>>>(A,x,y,JA,IA,N,WARPSIZE);
-    cudaThreadSynchronize();
-    
-    cudaMemcpy(host_y, y, sizeof(float) * N, cudaMemcpyDeviceToHost);  
+	constexpr const int WARPSIZE=32;
+	CSR_MatVecMultiply_Warped<float,TILESIZE><<<dim3((N*WARPSIZE+TILESIZE-1)/TILESIZE),dim3(TILESIZE)>>>(A,x,y,JA,IA,N,WARPSIZE);
+	cudaThreadSynchronize();
+	
+	cudaMemcpy(host_y, y, sizeof(float) * N, cudaMemcpyDeviceToHost);  
 
-    std::cout << " y : " << std::endl;
-    for (int iidx =0; iidx < N; iidx++) { 
-        float y_j = host_y[iidx] ;
-        std::cout << y_j << " "; 
-    }
+	std::cout << " y : " << std::endl;
+	for (int iidx =0; iidx < N; iidx++) { 
+		float y_j = host_y[iidx] ;
+		std::cout << y_j << " "; 
+	}
 
-    
+	
 }
+

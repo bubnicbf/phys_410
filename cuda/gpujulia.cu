@@ -68,9 +68,9 @@ int main(void) {
   kernel<<<grid,1>>>(dev_bitmap);
 
   HANDLE_ERROR(cudaMemcpy(bitmap.get_ptr(),
-        dev_bitmap,
-        bitmap.image_size(),
-        cudaMemcpyDeviceToHost ));
+			  dev_bitmap,
+			  bitmap.image_size(),
+			  cudaMemcpyDeviceToHost ));
   bitmap.display_and_exit();
 
   HANDLE_ERROR( cudaFree(dev_bitmap));

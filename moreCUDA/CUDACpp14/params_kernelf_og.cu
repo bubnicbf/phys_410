@@ -1,10 +1,10 @@
 /**
  * @file   : params_kernelf_og.cu
  * @brief  : Original implementation from njuffa, verbotim; 
- *              CUDA kernel functions as parameters with CUDA C++14, CUDA Unified Memory Management
+ * 				CUDA kernel functions as parameters with CUDA C++14, CUDA Unified Memory Management
  * @details : Original implementation from njuffa, verbotim 
- *              std::function vs. function pointer in C++11, C++14, and now in CUDA
- *              std::function vs. function pointer for CUDA kernel functions (i.e. __global__ )
+ * 				std::function vs. function pointer in C++11, C++14, and now in CUDA
+ * 				std::function vs. function pointer for CUDA kernel functions (i.e. __global__ )
  * 
  * @author : Ernest Yeung <ernestyalumni@gmail.com>
  * @date   : 20171020  
@@ -19,7 +19,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
@@ -64,7 +64,7 @@ __shared__ float partExtr[THREAD_COUNT];
 
 __device__ void minmax(float *x, float *res, int n, pf func)
 {
-//  __shared__ float partExtr[THREAD_COUNT];
+//	__shared__ float partExtr[THREAD_COUNT];
     int i;
     int tid = threadIdx.x;
 
@@ -116,8 +116,8 @@ float findExtremum (float *x, int n, int findmin)
     res_h = (float *)malloc (BLOCK_COUNT * sizeof(res_h[0]));
 
     if (!res_h) {
-        fprintf(stderr, "res_h allocation failed\n");
-        exit(EXIT_FAILURE);
+		fprintf(stderr, "res_h allocation failed\n");
+		exit(EXIT_FAILURE);
     }
 
     cudaMemcpy(res_h, res_d, BLOCK_COUNT * sizeof(res_d[0]), cudaMemcpyDeviceToHost);
@@ -128,8 +128,8 @@ float findExtremum (float *x, int n, int findmin)
     r = res_h[0];
 
     for (int i = 1; i < BLOCK_COUNT; i++) {
-        r = func_h[findmin](r, res_h[i]);
-    }
+		r = func_h[findmin](r, res_h[i]);
+	}
 
     free(res_h);
 
@@ -141,7 +141,7 @@ float findExtremum (float *x, int n, int findmin)
 
 int main (void)
 {
-    constexpr const int ELEM_COUNT = 8 ;
+	constexpr const int ELEM_COUNT = 8 ;
     float x[ELEM_COUNT] = {-1.3f, 2.4f, 3.5f, -2.3f, 4.5f, 0.4f, -5.3f, -1.6f};
 
     float minimum = findExtremum(x, ELEM_COUNT, 1);
@@ -158,12 +158,12 @@ int main (void)
 
 
 /**
- *  @brief std::function 
- *  @details "The type of a std::function-declared variable holding a closure 
- *              is an instantiation of std::function template, and that has 
- *              fixed size for any given signature.  
- *              This size may not be adequate for the closure it's asked to store, 
- *              and when that's the case, std::function constructor will allocate
- *              heap memory to store the closure.  
+ * 	@brief std::function 
+ * 	@details "The type of a std::function-declared variable holding a closure 
+ * 				is an instantiation of std::function template, and that has 
+ * 				fixed size for any given signature.  
+ * 				This size may not be adequate for the closure it's asked to store, 
+ * 				and when that's the case, std::function constructor will allocate
+ * 				heap memory to store the closure.  
  * @ref Scott Meyers, Effective Modern C++, pp. 39 Item 5 
  * */

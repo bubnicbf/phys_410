@@ -4,9 +4,9 @@
  * @author : Ernest Yeung <ernestyalumni@gmail.com>
  * @date   : 20170904  
  * @ref    : http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#asynchronous-concurrent-execution
- *         : 3.2.5. Asynchronous Concurrent Execution of CUDA Toolkit v8.0, 3. Programming Interface  
- *         : John Cheng, Max Grossman, Ty McKercher. Professional CUDA C Programming. 1st Ed. Wrox. 2014
- *         : Ch. 6 Streams and Concurrency; pp. 271   
+ * 		   : 3.2.5. Asynchronous Concurrent Execution of CUDA Toolkit v8.0, 3. Programming Interface  
+ * 		   : John Cheng, Max Grossman, Ty McKercher. Professional CUDA C Programming. 1st Ed. Wrox. 2014
+ * 		   : Ch. 6 Streams and Concurrency; pp. 271   
  * If you find this code useful, feel free to donate directly and easily at this direct PayPal link: 
  * 
  * https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ernestsaveschristmas%2bpaypal%40gmail%2ecom&lc=US&item_name=ernestyalumni&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted 
@@ -18,7 +18,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 

@@ -127,3 +127,4 @@ std::shared_ptr<float> RRModule_sh::get() {
 
 // destructor
 RRModule_sh::~RRModule_sh() {}
+

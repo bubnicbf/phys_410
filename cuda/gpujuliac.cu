@@ -1,22 +1,22 @@
-/* cf. Jason Sanders, Edward Kandrot. CUDA by Example: An Introduction to General-Purpose GPU Programming */
-/* 
-** Chapter 4 Parallel Programming in CUDA C
-** 4.2 CUDA Parallel Programming
-** 4.2.1 Summing Vectors
-*/
-#include <stdio.h>  /* printf */
-#include <stdlib.h> /* atof */
-#include "common/errors.h"
-#include "common/cpu_bitmap.h"
+/*
+ * gpujuliac.cu
+ * make Julia sets on the GPU
+ * Ernest Yeung ernestyalumni@gmail.com
+ * 20160617
+ * */
+#include <iostream>
+using namespace std;
+#include <cstdlib> /* atof */ 
+#include "./common/gpu_bitmap.h"
 
 // Constants that changes "scaling", what pts. are included in Julia set, and such
 #define DIM 1500
 #define MAG_THR 1000 // magnitude threshold that determines if pt. is in Julia set
-#define TESTITERS 500 // originally 200, tests further what points go to infinity; higher no. makes it "lacy"
+#define TESTITERS 300 // originally 200, tests further what points go to infinity; higher no. makes it "lacy"
 
 // Constants that change formula for f, f(z) = z*z + c
-#define CREAL -0.1 // originally -0.8
-#define CIMAG 0.654 // originally 0.154
+#define CREAL -0.8168 // originally -0.8
+#define CIMAG 0.1583 // originally 0.154
 
 struct cuComplex {
   float r;
@@ -49,7 +49,7 @@ __device__ int julia( int x, int y, const float scale) {
   return 1; // return 1 if point is in set
 }
 
-__global__ void kernel( unsigned char *ptr, const float scale) {
+__global__ void kernel( uchar4 *ptr, const float scale) {
   // map from threadIdx/BlockIdx to pixel position
   int x = blockIdx.x;
   int y = blockIdx.y;
@@ -57,12 +57,12 @@ __global__ void kernel( unsigned char *ptr, const float scale) {
 
   // now calculate the value at that position
   int juliaValue = julia(x,y,scale);
-  ptr[offset*4 + 0] = 255 * juliaValue;  // red if julia() returns 1, black if pt. not in set
-  ptr[offset*4 + 1] = 0;
-  ptr[offset*4 + 2] = 0;
-  ptr[offset*4 + 3] = 255;
-}
-  
+  ptr[offset].x = 255 * juliaValue;  // red if julia() returns 1, black if pt. not in set
+  ptr[offset].y = 0;
+  ptr[offset].z = 0;
+  ptr[offset].w = 255;
+} 
+
 int main(int argc, char *argv[]) {
 	float scale;
 	if (argc <= 1) { 
@@ -71,23 +71,15 @@ int main(int argc, char *argv[]) {
 	else {
 		scale = (float) atof( argv[1] );
 	}
-	CPUBitmap bitmap( DIM, DIM );
-	unsigned char *dev_bitmap;
-
-	HANDLE_ERROR( cudaMalloc( (void**)&dev_bitmap, bitmap.image_size() ) );
-
+	GPUBitmap bitmap( DIM, DIM );
+	
 	dim3 grid(DIM,DIM);
+	
+	// sanity check 
+	cout << "This is the value for scale currently: " << scale << endl;
+	
+	kernel<<<grid,1>>>(bitmap.devPtr,scale);
 
-	// sanity check with printf
-	printf("This is the value for scale currently: %f \n", scale);
-
-	kernel<<<grid,1>>>(dev_bitmap,scale);
-
-	HANDLE_ERROR(cudaMemcpy(bitmap.get_ptr(),
-				dev_bitmap,
-				bitmap.image_size(),
-				cudaMemcpyDeviceToHost ));
 	bitmap.display_and_exit();
-
-	HANDLE_ERROR( cudaFree(dev_bitmap));
 }
+

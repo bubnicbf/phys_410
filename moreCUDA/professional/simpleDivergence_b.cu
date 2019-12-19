@@ -16,7 +16,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
@@ -49,7 +49,7 @@ __global__ void mathKernel1(float *c)
         ib = 200.0f;
     }
 
-    printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
+	printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
     c[tid] = ia + ib;
 }
 
@@ -67,7 +67,7 @@ __global__ void mathKernel2(float *c)
     {
         ib = 200.0f;
     }
-    printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
+	printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
     c[tid] = ia + ib;
 }
 
@@ -89,7 +89,7 @@ __global__ void mathKernel3(float *c)
         ib = 200.0f;
     }
 
-    printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
+	printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
 
     c[tid] = ia + ib;
 }
@@ -111,7 +111,7 @@ __global__ void mathKernel4(float *c)
         ib = 200.0f;
     }
 
-    printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
+	printf(" tid : %d, c[tid] = %.f \n ", tid, ia+ib);
 
     c[tid] = ia + ib;
 }
@@ -150,52 +150,52 @@ int main(int argc, char **argv)
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    float gpu_time = 0.0f;
+	float gpu_time = 0.0f;
 
     // run a warmup kernel to remove overhead
     cudaDeviceSynchronize();
-    cudaEventRecord(start, 0);
+	cudaEventRecord(start, 0);
     mathKernel2<<<grid, block>>>(d_C);
     cudaDeviceSynchronize();
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
     cudaEventElapsedTime(&gpu_time, start, stop);
     printf("warmup      <<< %4d %4d >>> elapsed %.10f msec \n", grid.x, block.x,
            gpu_time );
-    cudaGetLastError();
+	cudaGetLastError();
 
     // run kernel 1
-    cudaEventRecord(start, 0);
+	cudaEventRecord(start, 0);
     mathKernel1<<<grid, block>>>(d_C);
-    cudaDeviceSynchronize();
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
+	cudaDeviceSynchronize();
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
     cudaEventElapsedTime(&gpu_time, start, stop);
     printf("mathKernel1 <<< %4d %4d >>> elapsed %.10f msec \n", grid.x, block.x,
            gpu_time );
-    cudaGetLastError();
+	cudaGetLastError();
 
     // run kernel 3
-    cudaEventRecord(start, 0);
+	cudaEventRecord(start, 0);
     mathKernel3<<<grid, block>>>(d_C);
-    cudaDeviceSynchronize();
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
+	cudaDeviceSynchronize();
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
     cudaEventElapsedTime(&gpu_time, start, stop);
     printf("mathKernel3 <<< %4d %4d >>> elapsed %.10f msec \n", grid.x, block.x,
            gpu_time );
     cudaGetLastError();
 
     // run kernel 4
-    cudaEventRecord(start, 0);
+	cudaEventRecord(start, 0);
     mathKernel4<<<grid, block>>>(d_C);
     cudaDeviceSynchronize();
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
     cudaEventElapsedTime(&gpu_time, start, stop);
     printf("mathKernel4 <<< %4d %4d >>> elapsed %.10f msec \n", grid.x, block.x,
            gpu_time );
-    cudaGetLastError();
+	cudaGetLastError();
 
 
     // free gpu memory and reset divece
@@ -206,3 +206,4 @@ int main(int argc, char **argv)
 
 
 }
+

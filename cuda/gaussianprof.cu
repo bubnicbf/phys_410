@@ -27,79 +27,80 @@
 
 __device__ double gaussian( double xvar, double A, double k, double x_0 )
 {
-    return A*exp(-k*(xvar-x_0)*(xvar-x_0) );
+	return A*exp(-k*(xvar-x_0)*(xvar-x_0) );
 }
 
-    
+	
 __global__ void kernel( uchar4 *ptr ) {
   // map from threadIdx/BlockIdx to pixel position
-    int x = threadIdx.x + blockIdx.x * blockDim.x ;
-//  int offset = x+y*gridDim.x * blockDim.x;
+	int x = threadIdx.x + blockIdx.x * blockDim.x ;
+//	int offset = x+y*gridDim.x * blockDim.x;
 
-    // now calculate the value at that position
-    double value = gaussian( ((double) x)*DELTAx, RHO0, 1./sqrt(0.00001), 0.25 ); 
+	// now calculate the value at that position
+	double value = gaussian( ((double) x)*DELTAx, RHO0, 1./sqrt(0.00001), 0.25 ); 
 
-    // calculate how many blocks in y-direction to fill up
-    int ivalue = ((int) (value*DIMY)) ;
-    
-    // remember that ptr is a pointer to uchar4 that CUDA and OpenGL shares to render bitmaps
+	// calculate how many blocks in y-direction to fill up
+	int ivalue = ((int) (value*DIMY)) ;
+	
+	// remember that ptr is a pointer to uchar4 that CUDA and OpenGL shares to render bitmaps
 /*
-    for (int j = 0; j<ivalue ; ++j) {
-        int offset = x + j * gridDim.x * blockDim.x ;
-        ptr[offset].x = 0;
-        ptr[offset].y = 255;
-        ptr[offset].z = 0;
-        ptr[offset].w = 255;
-    } 
-    for (int j = ivalue; j<DIMY; ++j) {
-        int offset = x + j * gridDim.x * blockDim.x ;
-        ptr[offset].x = 255;
-        ptr[offset].y = 0;
-        ptr[offset].z = 0;
-        ptr[offset].w = 255;
-    }
-    * */
-    
-    
-    for (int j = 0; j<DIMY; ++j) {
-        int offset = x + j * gridDim.x * blockDim.x ;
-        if (j < ivalue) {
-            ptr[offset].x = 0;
-            ptr[offset].y = 255;
-            ptr[offset].z = 0;
-            ptr[offset].w = 255;
-        } else {
-            ptr[offset].x = 255;
-            ptr[offset].y = 0;
-            ptr[offset].z = 0;
-            ptr[offset].w = 255;
-        }
-    }       
-    
+	for (int j = 0; j<ivalue ; ++j) {
+		int offset = x + j * gridDim.x * blockDim.x ;
+		ptr[offset].x = 0;
+		ptr[offset].y = 255;
+		ptr[offset].z = 0;
+		ptr[offset].w = 255;
+	} 
+	for (int j = ivalue; j<DIMY; ++j) {
+		int offset = x + j * gridDim.x * blockDim.x ;
+		ptr[offset].x = 255;
+		ptr[offset].y = 0;
+		ptr[offset].z = 0;
+		ptr[offset].w = 255;
+	}
+	* */
+	
+	
+	for (int j = 0; j<DIMY; ++j) {
+		int offset = x + j * gridDim.x * blockDim.x ;
+		if (j < ivalue) {
+			ptr[offset].x = 0;
+			ptr[offset].y = 255;
+			ptr[offset].z = 0;
+			ptr[offset].w = 255;
+		} else {
+			ptr[offset].x = 255;
+			ptr[offset].y = 0;
+			ptr[offset].z = 0;
+			ptr[offset].w = 255;
+		}
+	}		
+	
 /*
-    // test case
-    for (int j = 0; j<DIMY; ++j) {
-        int offset = x + j * gridDim.x * blockDim.x ;
-        if (j < DIMY/2) {
-            ptr[offset].x = 0;
-            ptr[offset].y = 255;
-            ptr[offset].z = 0;
-            ptr[offset].w = 255;
-        } else {
-            ptr[offset].x = 255;
-            ptr[offset].y = 0;
-            ptr[offset].z = 0;
-            ptr[offset].w = 255;
-        }
-    }       
+	// test case
+	for (int j = 0; j<DIMY; ++j) {
+		int offset = x + j * gridDim.x * blockDim.x ;
+		if (j < DIMY/2) {
+			ptr[offset].x = 0;
+			ptr[offset].y = 255;
+			ptr[offset].z = 0;
+			ptr[offset].w = 255;
+		} else {
+			ptr[offset].x = 255;
+			ptr[offset].y = 0;
+			ptr[offset].z = 0;
+			ptr[offset].w = 255;
+		}
+	}		
 */
 } 
 
 int main(int argc, char *argv[]) {
-    GPUBitmap bitmap( NCELLS, DIMY );
-    
-    int Mthreads = 40;  
-    kernel<<<NCELLS/Mthreads,Mthreads>>>(bitmap.devPtr);
+	GPUBitmap bitmap( NCELLS, DIMY );
+	
+	int Mthreads = 40;	
+	kernel<<<NCELLS/Mthreads,Mthreads>>>(bitmap.devPtr);
 
-    bitmap.display_and_exit();
+	bitmap.display_and_exit();
 }
+

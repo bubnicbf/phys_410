@@ -3,8 +3,8 @@
  * @brief  : Example of comparing singular value decomposition of a complex matrix  
  * I compare this implementation, that uses CUDA Unified Memory Management, against that by OrangeOwl
  *
- *              compute A = U*S*VT
- * @author : Ernest Yeung   ernestyalumni@gmail.com
+ * 				compute A = U*S*VT
+ * @author : Ernest Yeung	ernestyalumni@gmail.com
  * @date   : 20170628
  * @ref    :  cf. https://github.com/OrangeOwlSolutions/Linear-Algebra/blob/master/SVD/SVD_singular_values_only_complex.cu
  * 
@@ -19,25 +19,25 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
  * */
 /*
  * How to compile (assume cuda is installed at /usr/local/cuda/)
- *   nvcc -c -I/usr/local/cuda/include svd_example.cpp
- *   g++ -fopenmp -o a.out svd_example.o -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusolver
+ * 	 nvcc -c -I/usr/local/cuda/include svd_example.cpp
+ * 	 g++ -fopenmp -o a.out svd_example.o -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusolver
  * 
  * EY : 20170628 This also worked for me
  * nvcc -std=c++11 -arch='sm_52' -lcudart -lcublas -lcusolver SVD_vectors_unified.cu -o SVD_unified.exe
  * */
 
-#include <iostream>     // std::cout
-#include <iomanip>      // std::setprecision 
+#include <iostream> 	// std::cout
+#include <iomanip> 		// std::setprecision 
 
 // to make boilerplate, initialization
-#include <math.h>   // sqrt
+#include <math.h> 	// sqrt
 
 // needed for SVD
 #include <assert.h> // assert
@@ -55,7 +55,7 @@ constexpr const int lda = M;
 __device__ __managed__ float2 A[M*N] ;
 __device__ __managed__ float2 U[lda*M]; // m-by-m unitary matrix
 __device__ __managed__ float2 VT[N*N]; // n-by-n unitary matrix
-__device__ __managed__ float S[N];  // singular value
+__device__ __managed__ float S[N]; 	// singular value
 __device__ __managed__ int *devInfo = nullptr; 
 __device__ __managed__ float *d_rwork = NULL; 
 
@@ -67,95 +67,99 @@ __device__ __managed__ float *d_rwork = NULL;
  * */
 void printMatrix(int m, int n, const float *A, int lda, const char* name) 
 {
-    std::cout << name << std::endl;
-    for (int row =0; row <m; row++) {
-        for (int col =0 ; col <n ; col++) {
-            float Areg = A[row + col*lda]; 
-            std::cout << Areg << " " ; 
-        }
-        std::cout << std::endl;
-    }
+	std::cout << name << std::endl;
+	for (int row =0; row <m; row++) {
+		for (int col =0 ; col <n ; col++) {
+			float Areg = A[row + col*lda]; 
+			std::cout << Areg << " " ; 
+		}
+		std::cout << std::endl;
+	}
 }
 
 int main(int argc, char* argv[]) {
 
-    cusolverDnHandle_t cusolverH = NULL;
-    cusolverStatus_t cusolver_status = CUSOLVER_STATUS_SUCCESS;  
-    
-    // --- cuSOLVER input/output parameters/arrays
-    // working space, <type> array of size lwork
-    float2 *d_work = NULL;
-    // size of working array work
-    int lwork = 0;
-    
+	cusolverDnHandle_t cusolverH = NULL;
+	cusolverStatus_t cusolver_status = CUSOLVER_STATUS_SUCCESS;  
+	
+	// --- cuSOLVER input/output parameters/arrays
+	// working space, <type> array of size lwork
+	float2 *d_work = NULL;
+	// size of working array work
+	int lwork = 0;
+	
 // step 1: create cusolverDn/cublas handle, CUDA solver initialization
-    cusolver_status = cusolverDnCreate(&cusolverH);
-    assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
+	cusolver_status = cusolverDnCreate(&cusolverH);
+	assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
 
-    // --- Setting the boilerplate, initialization values
-    for (int i=0; i<M; i++) {
-        for (int j=0; j < N; j++) {
-            A[i+j*M].x = (i+j)*(i+j);
-            A[i+j*M].y = 2.f * sqrt((i+j)*(i+j));
-        }
-    }
+	// --- Setting the boilerplate, initialization values
+	for (int i=0; i<M; i++) {
+		for (int j=0; j < N; j++) {
+			A[i+j*M].x = (i+j)*(i+j);
+			A[i+j*M].y = 2.f * sqrt((i+j)*(i+j));
+		}
+	}
 
-// step 2: query working space of SVD   
-    cusolver_status = cusolverDnCgesvd_bufferSize( cusolverH, M, N, &lwork);
-    assert(cusolver_status == CUSOLVER_STATUS_SUCCESS);
-    std::cout << " \n lwork = " << lwork << std::endl << std::endl;
-    cudaMalloc((void**)&d_work, sizeof(float2)*lwork);
+// step 2: query working space of SVD	
+	cusolver_status = cusolverDnCgesvd_bufferSize( cusolverH, M, N, &lwork);
+	assert(cusolver_status == CUSOLVER_STATUS_SUCCESS);
+	std::cout << " \n lwork = " << lwork << std::endl << std::endl;
+	cudaMalloc((void**)&d_work, sizeof(float2)*lwork);
 
 // step 4: compute SVD
-    GpuTimer timer;
+	GpuTimer timer;
 
-    // --- CUDA SVD execution - Singular values only
-    timer.Start();
-    cusolver_status = cusolverDnCgesvd(cusolverH,'N','N', M,N, A, lda, 
-        S,U, 
-        lda, // ldu
-        VT, 
-        N, // ldvt
-        d_work,lwork, NULL, devInfo);
-    timer.Stop();
-    std::cout << " Calculation of singular values only : " << std::setprecision(7) << timer.Elapsed() << " ms " << std::endl;
-
-
-
-    // --- CUDA SVD execution - Full SVD    
-    
-    timer.Start();
-
-    cusolver_status = cusolverDnCgesvd(cusolverH,'A','A', M,N, A, lda, 
-        S,U, 
-        lda, // ldu
-        VT, 
-        N, // ldvt
-        d_work,lwork, d_rwork, devInfo);
-    timer.Stop();
-    
-    std::cout << " Calculation of the full SVD calculation : " << std::setprecision(7) << timer.Elapsed() << " ms " << std::endl;
+	// --- CUDA SVD execution - Singular values only
+	timer.Start();
+	cusolver_status = cusolverDnCgesvd(cusolverH,'N','N', M,N, A, lda, 
+		S,U, 
+		lda, // ldu
+		VT, 
+		N, // ldvt
+		d_work,lwork, NULL, devInfo);
+	timer.Stop();
+	std::cout << " Calculation of singular values only : " << std::setprecision(7) << timer.Elapsed() << " ms " << std::endl;
 
 
-        // print out
-    std::cout << " cusolver_status after SVD : " << cusolver_status << std::endl;
-    
-    std::cout << " after gesvd: info_gpu or devInfo = " << devInfo << std::endl ; 
-    assert(0 == devInfo);
-    std::cout << " ====== " << std::endl;   
-    
-    std::cout << " S = (matlab base-1) : " << std::endl; 
-    printMatrix(N,1,S,lda,"S");
-    std::cout << " ====== " << std::endl;   
 
-    
-    
+	// --- CUDA SVD execution - Full SVD	
+	
+	timer.Start();
+
+	cusolver_status = cusolverDnCgesvd(cusolverH,'A','A', M,N, A, lda, 
+		S,U, 
+		lda, // ldu
+		VT, 
+		N, // ldvt
+		d_work,lwork, d_rwork, devInfo);
+	timer.Stop();
+	
+	std::cout << " Calculation of the full SVD calculation : " << std::setprecision(7) << timer.Elapsed() << " ms " << std::endl;
+
+
+		// print out
+	std::cout << " cusolver_status after SVD : " << cusolver_status << std::endl;
+	
+	std::cout << " after gesvd: info_gpu or devInfo = " << devInfo << std::endl ; 
+	assert(0 == devInfo);
+	std::cout << " ====== " << std::endl; 	
+	
+	std::cout << " S = (matlab base-1) : " << std::endl; 
+	printMatrix(N,1,S,lda,"S");
+	std::cout << " ====== " << std::endl; 	
+
+	std::cout << " U values : " << std::setprecision(9) << U[0].x << " " << U[0].y << " " << U[1].x << " " << U[1].y << U[2].x << " " << U[2].y << std::endl;
+	std::cout << " VT values : " << std::setprecision(9) << VT[0].x << " " << VT[0].y << " " << VT[1].x << " " << VT[1].y << " " << VT[2].x << " " << VT[2].y << std::endl;
+
+
+	
 // free resources
-    if (cusolverH) cusolverDnDestroy(cusolverH);
-    if (d_work) cudaFree(d_work);
-    
-    cudaDeviceReset();
-    return 0;
+	if (cusolverH) cusolverDnDestroy(cusolverH);
+	if (d_work) cudaFree(d_work);
+	
+	cudaDeviceReset();
+	return 0;
 
 
 }
+

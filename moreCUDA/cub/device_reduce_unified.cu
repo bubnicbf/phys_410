@@ -2,7 +2,7 @@
  * @file   : device_reduce.cu
  * @brief  : demonstrating usage of CUDA CUB's device-(wide) reduce or sum
  * uses CUDA Unified Memory (Management)
- * @author : Ernest Yeung   ernestyalumni@gmail.com
+ * @author : Ernest Yeung	ernestyalumni@gmail.com
  * @date   : 20170418
  * @ref : cf. http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared
  * If you find this code useful, feel free to donate directly and easily at this direct PayPal link: 
@@ -16,7 +16,7 @@
  * (or math, sciences, etc.), so I am committed to keeping all my material 
  * open-source and free, whether or not 
  * sufficiently crowdfunded, under the open-source MIT license: 
- *  feel free to copy, edit, paste, make your own versions, share, use as you wish.  
+ * 	feel free to copy, edit, paste, make your own versions, share, use as you wish.  
  *  Just don't be an asshole and not give credit where credit is due.  
  * Peace out, never give up! -EY
  * 
@@ -35,7 +35,7 @@
 
 constexpr const int Lx = 2000;
 
-__device__ __managed__ float f[Lx];     // Lx size float array
+__device__ __managed__ float f[Lx]; 	// Lx size float array
 __device__ __managed__ float g; // (single) float
 
 //---------------------------------------------------------------------
@@ -43,10 +43,10 @@ __device__ __managed__ float g; // (single) float
 //---------------------------------------------------------------------
 template <typename TypeT>
 __global__ void Initialize(TypeT* f, const int n, const int Lx) {
-    int k_x = threadIdx.x + blockDim.x * blockIdx.x;
-    if (k_x >= Lx) { return; }
-    
-    f[k_x] = powf( ((TypeT) k_x), n); 
+	int k_x = threadIdx.x + blockDim.x * blockIdx.x;
+	if (k_x >= Lx) { return; }
+	
+	f[k_x] = powf( ((TypeT) k_x), n); 
 }
 
 //---------------------------------------------------------------------
@@ -54,39 +54,39 @@ __global__ void Initialize(TypeT* f, const int n, const int Lx) {
 //---------------------------------------------------------------------
 int main(int argc, char** argv) 
 {
-    constexpr const int exp_power = 2;
-    dim3 M_i(1024,1,1);
+	constexpr const int exp_power = 2;
+	dim3 M_i(1024,1,1);
 
-    Initialize<float><<< (Lx+M_i.x-1)/M_i.x, M_i.x >>>( f,exp_power,Lx);
-    
-    // Request and allocate temporary storage
-    size_t temp_storage_bytes=0;
-    float* d_temp_storage=nullptr;
-    
-    cub::DeviceReduce::Sum( d_temp_storage, temp_storage_bytes, f, &g, Lx);
-    CubDebugExit( 
-        cudaMalloc(&d_temp_storage, temp_storage_bytes) );
-    
-    // Run
-    cub::DeviceReduce::Sum( d_temp_storage, temp_storage_bytes, f, &g , Lx); 
-    
-    // print out
-    // You can only do the following line on a GPU card with compute capability of 6.x or greater
-    // on the EVGA GeForce GTX 980Ti I have with Maxwell architecture, I can't do the following line of code, 
-    // printing g immediately.  But I tested this exact same code on a 1050 mobile (Pascal architecture) and it works without a hitch
-    // std::cout << " summation : " << g << std::endl; 
-    // On compute capability 5.2 or so, less than 6.x, I have to do this:
-    float h_g =0;
-    cudaMemcpy(&h_g,&g,sizeof(float) * 1, cudaMemcpyDeviceToHost) ;
+	Initialize<float><<< (Lx+M_i.x-1)/M_i.x, M_i.x >>>( f,exp_power,Lx);
+	
+	// Request and allocate temporary storage
+	size_t temp_storage_bytes=0;
+	float* d_temp_storage=nullptr;
+	
+	cub::DeviceReduce::Sum( d_temp_storage, temp_storage_bytes, f, &g, Lx);
+	CubDebugExit( 
+		cudaMalloc(&d_temp_storage, temp_storage_bytes) );
+	
+	// Run
+	cub::DeviceReduce::Sum( d_temp_storage, temp_storage_bytes, f, &g , Lx); 
+	
+	// print out
+	// You can only do the following line on a GPU card with compute capability of 6.x or greater
+	// on the EVGA GeForce GTX 980Ti I have with Maxwell architecture, I can't do the following line of code, 
+	// printing g immediately.  But I tested this exact same code on a 1050 mobile (Pascal architecture) and it works without a hitch
+	// std::cout << " summation : " << g << std::endl; 
+	// On compute capability 5.2 or so, less than 6.x, I have to do this:
+	float h_g =0;
+	cudaMemcpy(&h_g,&g,sizeof(float) * 1, cudaMemcpyDeviceToHost) ;
 
-    std::cout << " summation : " << h_g << std::endl; 
-    
-    
-    
-    // Cleanup
-    if (d_temp_storage) {
-        CubDebugExit( cudaFree( d_temp_storage) ); }
+	std::cout << " summation : " << h_g << std::endl; 
+	
+	
+	
+	// Cleanup
+	if (d_temp_storage) {
+		CubDebugExit( cudaFree( d_temp_storage) ); }
 
-    
+	
 }
-    
+	
